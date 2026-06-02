@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#111111">
+  <title>MRA — Sistema de Pagamento</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<div id="toast-container"></div>
+
+<!-- ── HEADER DESKTOP ── -->
+<header class="header">
+  <a class="logo" href="#">
+    <div class="logo-mra">
+      <span class="logo-mra-sigla">MRA</span>
+      <span class="logo-mra-sub">MOCHILAS E BOLSAS</span>
+    </div>
+  </a>
+  <nav class="header-nav">
+    <button class="nav-btn active" onclick="showPage('cadastro', this)">＋ Cadastrar</button>
+    <button class="nav-btn" onclick="showPage('funcionarios', this)">
+      ◈ Funcionários
+      <span class="badge-count" data-page="funcionarios"></span>
+    </button>
+    <button class="nav-btn" onclick="showPage('faltas', this)">✕ Faltas</button>
+    <button class="nav-btn" onclick="showPage('vales', this)">💵 Vales</button>
+    <button class="nav-btn" onclick="showPage('folha', this)">▣ Folha de Pagamento</button>
+  </nav>
+</header>
+
+<!-- ── BOTTOM NAV MOBILE ── -->
+<nav class="bottom-nav">
+  <div class="bottom-nav-inner">
+    <button class="bottom-btn active" id="bnav-cadastro" onclick="showPageMobile('cadastro')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="16" y1="11" x2="22" y2="11"/></svg>
+      <span>Cadastrar</span>
+    </button>
+    <button class="bottom-btn" id="bnav-funcionarios" onclick="showPageMobile('funcionarios')">
+      <span class="dot" id="dot-funcs"></span>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="3"/><path d="M21 20c0-2.8-1.8-5-4-5.5"/></svg>
+      <span>Funcionários</span>
+    </button>
+    <button class="bottom-btn" id="bnav-faltas" onclick="showPageMobile('faltas')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+      <span>Faltas</span>
+    </button>
+    <button class="bottom-btn" id="bnav-vales" onclick="showPageMobile('vales')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 10h20"/><circle cx="12" cy="15" r="2"/></svg>
+      <span>Vales</span>
+    </button>
+    <button class="bottom-btn" id="bnav-folha" onclick="showPageMobile('folha')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>
+      <span>Folha</span>
+    </button>
+  </div>
+</nav>
+
+<div class="container">
+
+  <!-- ════════════ CADASTRO ════════════ -->
+  <div id="page-cadastro" class="page active">
+    <div class="page-title">Cadastrar <span>Funcionário</span></div>
+
+    <div class="card animate-in">
+      <div class="card-title">Dados pessoais</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Nome completo *</label>
+          <input type="text" id="c-nome" placeholder="Ex: João da Silva" autocomplete="name">
+        </div>
+        <div class="form-group">
+          <label>CPF *</label>
+          <input type="text" id="c-cpf" placeholder="000.000.000-00" maxlength="14" inputmode="numeric" oninput="maskCPF(this)">
+        </div>
+        <div class="form-group">
+          <label>Cargo *</label>
+          <input type="text" id="c-cargo" placeholder="Ex: Auxiliar Administrativo">
+        </div>
+        <div class="form-group">
+          <label>Departamento</label>
+          <input type="text" id="c-depto" placeholder="Ex: Financeiro">
+        </div>
+        <div class="form-group">
+          <label>Salário base (R$) *</label>
+          <input type="number" id="c-salario" min="0" step="0.01" placeholder="0,00" inputmode="decimal">
+        </div>
+        <div class="form-group">
+          <label>Data de admissão</label>
+          <div class="data-wrapper"><input type="text" id="c-admissao" placeholder="dd/mm/aaaa" maxlength="10" inputmode="numeric" oninput="maskData(this)"><button class="cal-btn" type="button" onclick="abrirCalendario('c-admissao')" title="Abrir calendário">📅</button></div>
+        </div>
+        <div class="form-group full">
+          <label>Observações</label>
+          <textarea id="c-obs" placeholder="Informações adicionais..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="card animate-in" style="animation-delay:.07s">
+      <div class="card-title">Gratificações extras</div>
+      <div class="grat-fixa-toggle" style="display:flex;align-items:center;justify-content:space-between;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:14px 16px;margin-bottom:14px;gap:12px;flex-wrap:wrap">
+        <div>
+          <div style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:3px">Gratificação fixa de <span style="color:var(--red-l)">R$ 300,00</span></div>
+          <div style="font-size:12px;color:var(--muted)">Ative se este funcionário tem direito à gratificação fixa mensal</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="c-grat-fixa">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <!-- Toggle gratificação auxiliar R$200 -->
+      <div class="grat-fixa-toggle" style="display:flex;align-items:center;justify-content:space-between;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:14px 16px;margin-bottom:12px;gap:12px;flex-wrap:wrap">
+        <div>
+          <div style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:3px">Gratificação auxiliar de <span style="color:var(--red-l)">R$ 200,00</span></div>
+          <div style="font-size:12px;color:var(--muted)">Ative se este funcionário tem direito à gratificação dos auxiliares</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="c-grat-aux">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.6">
+        Adicione outras gratificações personalizadas abaixo.<br>
+        <em style="font-size:12px;color:var(--dim)">Obs: todas são canceladas se o funcionário tiver qualquer falta no mês.</em>
+      </p>
+      <div class="row grat-row" style="margin-bottom:12px">
+        <input type="text" id="g-nome" placeholder="Nome da gratificação" style="flex:1;min-width:140px">
+        <input type="number" id="g-valor" placeholder="Valor R$" step="0.01" min="0" inputmode="decimal" style="width:130px">
+        <button class="btn btn-sm btn-primary" onclick="addGrat()">＋ Adicionar</button>
+      </div>
+      <div id="grat-lista" class="row" style="min-height:34px"></div>
+    </div>
+
+    <div class="row r-end animate-in" style="animation-delay:.13s">
+      <button class="btn btn-ghost" onclick="limparForm()">Limpar</button>
+      <button class="btn btn-primary" id="btn-cadastrar" onclick="cadastrar()">
+        <span class="btn-text">✓ Cadastrar funcionário</span>
+        <span class="spinner"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ════════════ FUNCIONÁRIOS ════════════ -->
+  <div id="page-funcionarios" class="page">
+    <div class="search-row">
+      <div class="page-title" style="margin:0">Funcionários <span>Cadastrados</span></div>
+      <input type="text" id="busca" placeholder="Buscar por nome..." oninput="carregarFuncionarios()" style="max-width:240px">
+    </div>
+    <div id="lista-funcionarios">
+      <div class="empty"><div class="empty-icon">◈</div>Carregando...</div>
+    </div>
+  </div>
+
+  <!-- ════════════ FALTAS ════════════ -->
+  <div id="page-faltas" class="page">
+    <div class="page-title">Registrar <span>Falta</span></div>
+
+    <div class="card animate-in">
+      <div class="card-title">Nova falta</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Funcionário *</label>
+          <select id="f-func"><option value="">Selecione um funcionário...</option></select>
+        </div>
+        <div class="form-group">
+          <label>Data da falta *</label>
+          <div class="data-wrapper"><input type="text" id="f-data" placeholder="dd/mm/aaaa" maxlength="10" inputmode="numeric" oninput="maskData(this)"><button class="cal-btn" type="button" onclick="abrirCalendario('f-data')" title="Abrir calendário">📅</button></div>
+        </div>
+        <div class="form-group full">
+          <label>Tipo de falta *</label>
+          <div class="tipo-group">
+            <button class="tipo-btn sel" id="tipo-simples" onclick="setTipo('simples')">
+              ✕ Falta simples
+              <span class="sub">Desconta salário + perde gratificação</span>
+            </button>
+            <button class="tipo-btn" id="tipo-atestado" onclick="setTipo('atestado')">
+              ✦ Atestado médico / Dentista
+              <span class="sub">Sem desconto — perde gratificação</span>
+            </button>
+            <button class="tipo-btn" id="tipo-outro" onclick="setTipo('outro')">
+              ◈ Outro motivo justificado
+              <span class="sub">Sem desconto — perde gratificação</span>
+            </button>
+          </div>
+        </div>
+        <!-- Campo de foto do atestado (aparece só quando atestado é selecionado) -->
+        <div class="form-group full" id="campo-foto-atestado" style="display:none">
+          <label style="color:var(--warn)">📎 Foto do atestado médico</label>
+          <div id="upload-area" onclick="document.getElementById('f-foto').click()"
+            style="border:2px dashed rgba(255,193,7,0.4);border-radius:var(--r);padding:20px;text-align:center;cursor:pointer;background:rgba(255,193,7,0.04);transition:all .2s"
+            ondragover="event.preventDefault();this.style.borderColor='var(--warn)'"
+            ondragleave="this.style.borderColor='rgba(255,193,7,0.4)'"
+            ondrop="handleDrop(event)">
+            <div id="upload-preview" style="display:none;position:relative">
+              <img id="preview-img" style="max-width:100%;max-height:200px;border-radius:4px;object-fit:contain">
+              <button onclick="event.stopPropagation();removerFoto()" style="position:absolute;top:4px;right:4px;background:#cc2222;color:#fff;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:14px;line-height:1">✕</button>
+            </div>
+            <div id="upload-placeholder">
+              <div style="font-size:32px;margin-bottom:8px;opacity:.5">📷</div>
+              <div style="font-size:14px;color:var(--warn);font-weight:500">Clique ou arraste a foto aqui</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:4px">JPG, PNG ou PDF — Câmera do celular também funciona</div>
+            </div>
+          </div>
+          <input type="file" id="f-foto" accept="image/*,application/pdf" capture="environment" style="display:none" onchange="previewFoto(this)">
+        </div>
+
+        <div class="form-group full">
+          <label>Justificativa *</label>
+          <textarea id="f-just" placeholder="Descreva o motivo da falta com detalhes..."></textarea>
+        </div>
+      </div>
+      <div class="row r-end" style="margin-top:14px">
+        <button class="btn btn-primary" id="btn-falta" onclick="registrarFalta()">
+          <span class="btn-text">✓ Registrar falta</span>
+          <span class="spinner"></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="search-row" style="margin-top:1.5rem">
+      <div class="section-title">Faltas Registradas</div>
+      <select id="filtro-faltas" onchange="carregarFaltas()">
+        <option value="">Todos os funcionários</option>
+      </select>
+    </div>
+    <div id="lista-faltas">
+      <div class="empty"><div class="empty-icon">◈</div>Carregando...</div>
+    </div>
+  </div>
+
+
+  <!-- ════════════ VALES ════════════ -->
+  <div id="page-vales" class="page">
+    <div class="page-title">Registrar <span>Vale</span></div>
+
+    <div class="card animate-in">
+      <div class="card-title">Novo vale</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Mês de referência *</label>
+          <input type="month" id="v-mes">
+        </div>
+        <div class="form-group">
+          <label>Data do vale *</label>
+          <div class="data-wrapper">
+            <input type="text" id="v-data" placeholder="dd/mm/aaaa" maxlength="10" inputmode="numeric" oninput="maskData(this)">
+            <button class="cal-btn" type="button" onclick="abrirCalendario('v-data')" title="Abrir calendário">📅</button>
+          </div>
+        </div>
+        <div class="form-group full">
+          <label>Observação</label>
+          <input type="text" id="v-obs" placeholder="Ex: Adiantamento de salário">
+        </div>
+      </div>
+
+      <div style="margin-top:1rem">
+        <!-- Barra aplicar valor único - ACIMA da lista -->
+        <div style="display:flex;align-items:center;gap:10px;background:var(--red-dim2);border:1px solid rgba(204,34,34,0.25);border-radius:6px;padding:12px 14px;margin-bottom:10px;flex-wrap:wrap">
+          <span style="font-size:13px;color:var(--gray-l);flex:1;min-width:140px">💵 Mesmo valor para todos selecionados:</span>
+          <div class="row" style="gap:8px">
+            <input type="number" id="v-valor-unico" placeholder="0,00" step="0.01" min="0" inputmode="decimal" style="width:120px">
+            <button class="btn btn-sm btn-primary" onclick="aplicarValorUnico()">✓ Aplicar</button>
+          </div>
+        </div>
+
+        <!-- Cabeçalho com busca e botões -->
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px">
+          <label style="font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--muted)">Selecione os funcionários</label>
+          <div class="row" style="gap:8px">
+            <input type="text" id="v-busca-func" placeholder="Buscar..." oninput="filtrarValeFunc()" style="width:160px">
+            <button class="btn btn-sm" onclick="selecionarTodosVale()">Todos</button>
+            <button class="btn btn-sm btn-ghost" onclick="deselecionarTodosVale()">Limpar</button>
+          </div>
+        </div>
+
+        <!-- Lista de funcionários -->
+        <div id="v-func-lista" style="display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto;padding-right:4px"></div>
+      </div>
+
+      <div class="row r-end" style="margin-top:14px">
+        <button class="btn btn-primary" id="btn-vale" onclick="registrarVales()">
+          <span class="btn-text">✓ Registrar vales</span>
+          <span class="spinner"></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="search-row" style="margin-top:1.5rem">
+      <div class="section-title">Vales Registrados</div>
+      <input type="month" id="filtro-mes-vale" onchange="carregarVales()">
+    </div>
+    <div id="lista-vales">
+      <div class="empty"><div class="empty-icon">◈</div>Carregando...</div>
+    </div>
+  </div>
+
+  <!-- ════════════ FOLHA ════════════ -->
+  <div id="page-folha" class="page">
+    <div class="page-title">Folha de <span>Pagamento</span></div>
+
+    <div class="card animate-in no-print">
+      <div class="card-title">Configuração da folha</div>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Mês de referência</label>
+          <input type="month" id="folha-mes" onchange="atualizarDiasMes()">
+          <input type="hidden" id="folha-dias">
+        </div>
+        <div class="form-group">
+          <label>Funcionário</label>
+          <select id="folha-func">
+            <option value="">Todos os funcionários</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Buscar por nome</label>
+          <input type="text" id="folha-busca" placeholder="Digite o nome..." oninput="filtrarFolha()">
+        </div>
+      </div>
+      <div class="row r-end" style="margin-top:14px;gap:8px">
+        <button class="btn btn-primary" id="btn-folha" onclick="gerarFolha()">
+          <span class="btn-text">◉ Gerar folha</span>
+          <span class="spinner"></span>
+        </button>
+        <button class="btn" onclick="imprimirFolha()">⎙ Imprimir</button>
+      </div>
+    </div>
+
+    <div id="area-impressao"><div class="print-header" style="display:none;text-align:center;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid #cc2222"><div style="font-size:24px;font-weight:700;letter-spacing:2px;color:#cc2222">FOLHAPAY</div><div style="font-size:13px;color:#555;margin-top:4px" id="print-subtitulo"></div></div><div id="folha-resultado"></div></div>
+  </div>
+
+</div>
+
+<script src="/js/app.js"></script>
+<script>
+  // Navegação mobile (bottom nav)
+  function showPageMobile(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.bottom-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('page-' + name).classList.add('active');
+    document.getElementById('bnav-' + name).classList.add('active');
+    if (name === 'funcionarios') carregarFuncionarios();
+    if (name === 'faltas') { carregarSelectFuncs(); carregarFaltas(); }
+    if (name === 'folha') carregarSelectFuncs();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>
