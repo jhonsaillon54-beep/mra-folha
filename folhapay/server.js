@@ -1,9 +1,9 @@
 const express = require('express');
-const cors = require('cors');
-const path = require('path');
+const cors    = require('cors');
+const path    = require('path');
 
-const app = express();
-const PORT = 3000;
+const app  = express();
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
@@ -21,9 +21,9 @@ app.get('*', (req, res) => {
 
 app.listen(PORT, () => {
   console.log('');
-  console.log('  ██████╗░░░░░ MRA Mochilas e Bolsas ░░░░░██████╗');
+  console.log('  ██████╗ MRA Mochilas e Bolsas ██████╗');
   console.log('');
   console.log(`  ✅  Servidor rodando em: http://localhost:${PORT}`);
-  console.log(`  📂  Banco de dados:       folhapay.db`);
+  console.log(`  🗄️  Banco: ${process.env.DATABASE_URL ? 'PostgreSQL (Railway)' : 'PostgreSQL (local)'}`);
   console.log('');
 });
