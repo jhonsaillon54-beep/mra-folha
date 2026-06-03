@@ -767,7 +767,25 @@ function renderFolhaHTML(data) {
     '</div>';
   });
   if (data.data.length>1) {
-    html+='<div class="total-geral"><div class="lbl">Total geral da folha</div><div class="val">'+fmt(parseFloat(data.total_geral))+'</div></div>';
+    var totalVales = data.data.reduce(function(s,r){ return s + (r.valorVale>0 ? parseFloat(r.valorVale) : 0); }, 0);
+    var totalBruto = data.data.reduce(function(s,r){ return s + parseFloat(r.totalLiquido) + (r.valorVale>0 ? parseFloat(r.valorVale) : 0); }, 0);
+    var totalRestante = parseFloat(data.total_geral);
+    html+='<div class="total-geral" style="flex-direction:column;align-items:stretch;gap:8px">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center">' +
+        '<div class="lbl">Total bruto da folha</div>' +
+        '<div class="val">'+fmt(totalBruto)+'</div>' +
+      '</div>' +
+      (totalVales>0 ?
+        '<div style="display:flex;justify-content:space-between;align-items:center;opacity:.85">' +
+          '<div class="lbl">(-) Total de vales pagos</div>' +
+          '<div class="val" style="font-size:18px">- '+fmt(totalVales)+'</div>' +
+        '</div>' +
+        '<div style="border-top:1px solid rgba(255,255,255,0.2);padding-top:8px;display:flex;justify-content:space-between;align-items:center">' +
+          '<div class="lbl">Restante a pagar</div>' +
+          '<div class="val">'+fmt(totalRestante)+'</div>' +
+        '</div>'
+      : '') +
+    '</div>';
   }
   el.innerHTML=html;
 }
