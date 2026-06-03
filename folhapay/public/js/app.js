@@ -587,7 +587,8 @@ async function registrarVales() {
   var btn=document.getElementById('btn-vale');
   var mes=document.getElementById('v-mes').value;
   var dataRaw=document.getElementById('v-data')?document.getElementById('v-data').value:'';
-  var data_vale=toISO(dataRaw);
+  var hoje=new Date();
+  var data_vale = dataRaw ? toISO(dataRaw) : hoje.getFullYear()+'-'+String(hoje.getMonth()+1).padStart(2,'0')+'-'+String(hoje.getDate()).padStart(2,'0');
   var obs=document.getElementById('v-obs').value.trim();
   if (!mes){toast('Selecione o mês de referência.','err');return;}
   var selecionados = [];
@@ -661,6 +662,7 @@ async function excluirVale(id) {
     toast('Vale removido.','info');
   } catch(e){}
 }
+
 
 // ─── FOLHA ───────────────────────────────────────────────────
 
