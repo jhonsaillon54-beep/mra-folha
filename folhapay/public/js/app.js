@@ -372,18 +372,31 @@ function renderValeFunc(busca) {
   var lista = _todosFunc.filter(function(f){ return f.nome.toLowerCase().includes((busca||'').toLowerCase()); });
   if (!lista.length) { el.innerHTML='<div style="text-align:center;padding:1rem;color:var(--dim);font-size:13px">Nenhum funcionário encontrado.</div>'; return; }
   el.innerHTML = lista.map(function(f) {
-    return '<div class="vale-func-item" id="vfi-'+f.id+'" style="display:flex;align-items:center;gap:12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;transition:border-color .2s">' +
-      '<input type="checkbox" id="vfc-'+f.id+'" class="vale-check" onchange="toggleValeFunc('+f.id+')" style="width:16px;height:16px;accent-color:var(--red);cursor:pointer;flex-shrink:0">' +
+    return '<div class="vale-func-item" id="vfi-'+f.id+'" style="display:flex;align-items:center;gap:12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;transition:border-color .2s;cursor:pointer" onclick="clicarValeFunc('+f.id+')">' +
+      '<input type="checkbox" id="vfc-'+f.id+'" style="width:20px;height:20px;accent-color:var(--red);cursor:pointer;flex-shrink:0;pointer-events:none">' +
       '<div style="flex:1;min-width:0">' +
         '<div style="font-family:Rajdhani,sans-serif;font-size:15px;font-weight:700;color:var(--text)">'+f.nome+'</div>' +
         '<div style="font-size:12px;color:var(--muted)">'+f.cargo+(f.departamento?' — '+f.departamento:'')+'</div>' +
       '</div>' +
-      '<div style="display:flex;align-items:center;gap:8px">' +
+      '<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">' +
         '<span style="font-size:12px;color:var(--muted)">R$</span>' +
-        '<input type="number" id="vfv-'+f.id+'" placeholder="0,00" step="0.01" min="0" style="width:110px;opacity:.4;pointer-events:none" disabled>' +
+        '<input type="number" id="vfv-'+f.id+'" placeholder="0,00" step="0.01" min="0" onclick="event.stopPropagation()" style="width:100px;opacity:.4;pointer-events:none" disabled>' +
       '</div>' +
     '</div>';
   }).join('');
+}
+
+function clicarValeFunc(id) {
+  var cb = document.getElementById('vfc-'+id);
+  var input = document.getElementById('vfv-'+id);
+  var item = document.getElementById('vfi-'+id);
+  if (!cb||!input||!item) return;
+  cb.checked = !cb.checked;
+  input.disabled = !cb.checked;
+  input.style.opacity = cb.checked ? '1' : '.4';
+  input.style.pointerEvents = cb.checked ? 'auto' : 'none';
+  item.style.borderColor = cb.checked ? 'var(--red)' : 'var(--border)';
+  if (cb.checked) setTimeout(function(){ input.focus(); }, 50);
 }
 
 function toggleValeFunc(id) {
@@ -758,7 +771,6 @@ function renderFolhaHTML(data) {
 // ─── IMPRESSÃO ───────────────────────────────────────────────
 
 function _abrirJanela(htmlConteudo) {
-  // Abre a janela IMEDIATAMENTE (sem async/await) para iOS não bloquear
   var w = window.open('', '_blank');
   if (!w) { toast('Permita pop-ups para este site nas configurações do Safari.', 'err'); return; }
 
