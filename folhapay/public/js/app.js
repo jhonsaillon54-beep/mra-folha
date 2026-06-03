@@ -856,7 +856,13 @@ function imprimirFolha() {
       '<td class="num"><strong>'+fmt(parseFloat(r.totalLiquido))+'</strong></td>'+
     '</tr>';
   });
-  html += '<tr class="total-row"><td colspan="7">TOTAL GERAL DA FOLHA</td><td class="num">'+fmt(totalGeral)+'</td></tr>';
+  var totalValesImp = _dadosFolha.data.reduce(function(s,r){ return s + (r.valorVale>0 ? parseFloat(r.valorVale) : 0); }, 0);
+var totalBrutoImp = totalGeral + totalValesImp;
+html += '<tr class="total-row"><td colspan="7">TOTAL BRUTO DA FOLHA</td><td class="num">'+fmt(totalBrutoImp)+'</td></tr>';
+if (totalValesImp > 0) {
+  html += '<tr style="background:#fff8f0"><td colspan="7" style="color:#b8860b;font-weight:600">(-) Total de vales pagos</td><td class="num" style="color:#b8860b;font-weight:600">- '+fmt(totalValesImp)+'</td></tr>';
+  html += '<tr class="total-row" style="background:#fff0f0"><td colspan="7">RESTANTE A PAGAR</td><td class="num">'+fmt(totalGeral)+'</td></tr>';
+}
   html += '</tbody></table><div class="rodape">MRA Mochilas e Bolsas — '+new Date().toLocaleString('pt-BR')+'</div></body></html>';
   _abrirJanela(html);
 }
