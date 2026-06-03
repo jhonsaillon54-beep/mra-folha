@@ -858,19 +858,45 @@ function renderFolhaHTML(data) {
 }
 // ─── IMPRESSÃO ──────────────────────────────────────────────
 
-var mn=['','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+// ─── IMPRESSÃO — PATCH MOBILE-FRIENDLY ──────────────────────
+// Substitua as funções imprimirFolha e imprimirFuncionario no app.js por estas:
+
+function _abrirJanela(html, titulo) {
+  // Injeta barra de ação (fechar + imprimir) no topo do HTML
+  var barra =
+    '<div id="__barra" style="position:fixed;top:0;left:0;right:0;z-index:99999;background:#111;border-bottom:2px solid #cc2222;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;gap:10px;font-family:Arial,sans-serif">' +
+      '<button onclick="window.close()" style="background:#2a2a2a;color:#f0f0f0;border:1px solid #3a3a3a;border-radius:6px;padding:8px 16px;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:6px">← Voltar</button>' +
+      '<span style="color:#cc2222;font-family:Arial Black,Arial;font-weight:900;font-size:14px;letter-spacing:1px">MRA</span>' +
+      '<button onclick="window.print()" style="background:#cc2222;color:#fff;border:none;border-radius:6px;padding:8px 16px;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:6px">⎙ Imprimir</button>' +
+    '</div>' +
+    '<div style="height:56px"></div>'; // espaço para a barra não cobrir conteúdo
+
+  // Insere a barra logo após <body>
+  var htmlFinal = html.replace('<body>', '<body>' + barra);
+
+  // Adiciona CSS para esconder a barra na impressão
+  htmlFinal = htmlFinal.replace('</style>', '#__barra{display:flex!important}@media print{#__barra{display:none!important}}</style>');
+
+  var w = window.open('', '_blank');
+  if (!w) {
+    toast('Bloqueio de pop-up detectado. Permita pop-ups para este site.', 'err');
+    return;
+  }
+  w.document.write(htmlFinal);
+  w.document.close();
+  w.focus();
+}
 
 function imprimirFolha() {
-  // Resumo geral — todos em uma única folha
   if (!_dadosFolha || !_dadosFolha.data.length) {
     toast('Gere a folha primeiro.', 'err'); return;
   }
   var mes = document.getElementById('folha-mes').value;
   var mesNome = '', ano = '';
-  if (mes) { var mp=mes.split('-'); ano=mp[0]; mesNome=mn[parseInt(mp[1])]; }
+  if (mes) { var mp = mes.split('-'); ano = mp[0]; mesNome = mn[parseInt(mp[1])]; }
   var dias = diasDoMes(mes);
 
-  var html = '<html><head><meta charset="UTF-8"><style>' +
+  var html = '<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>' +
     'body{font-family:Arial,sans-serif;font-size:11px;color:#000;margin:0;padding:20px}' +
     '.logo-box-print{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;border:2.5px solid #1a1a1a;border-radius:3px;padding:4px 14px;background:#fff;line-height:1;gap:1px;margin-bottom:8px}' +
     '.logo-sigla-print{font-family:Arial Black,Arial,sans-serif;font-size:28px;font-weight:900;color:#cc2222;letter-spacing:3px;line-height:1}' +
@@ -931,24 +957,15 @@ function imprimirFolha() {
     '</tr>';
   });
 
-  html += '<tr class="total-row">' +
-    '<td colspan="7">TOTAL GERAL DA FOLHA</td>' +
-    '<td class="num">'+fmt(totalGeral)+'</td>' +
-  '</tr>';
-
+  html += '<tr class="total-row"><td colspan="7">TOTAL GERAL DA FOLHA</td><td class="num">'+fmt(totalGeral)+'</td></tr>';
   html += '</tbody></table>';
   html += '<div class="rodape">MRA Mochilas e Bolsas — ' + new Date().toLocaleString('pt-BR') + '</div>';
   html += '</body></html>';
 
-  var w = window.open('','_blank','width=900,height=700');
-  w.document.write(html);
-  w.document.close();
-  w.focus();
-  setTimeout(function(){ w.print(); }, 600);
+  _abrirJanela(html);
 }
 
 function imprimirFuncionario(funcId, btn) {
-  // Recibo individual em meia folha com assinatura
   if (!_dadosFolha) { toast('Gere a folha primeiro.', 'err'); return; }
   var r = _dadosFolha.data.find(function(r){ return r.funcionario.id === funcId; });
   if (!r) { toast('Funcionário não encontrado na folha.', 'err'); return; }
@@ -956,116 +973,76 @@ function imprimirFuncionario(funcId, btn) {
   var f = r.funcionario;
   var mes = document.getElementById('folha-mes').value;
   var mesNome = '', ano = '';
-  if (mes) { var mp=mes.split('-'); ano=mp[0]; mesNome=mn[parseInt(mp[1])]; }
+  if (mes) { var mp = mes.split('-'); ano = mp[0]; mesNome = mn[parseInt(mp[1])]; }
   var salProp = r.salarioProporcional !== undefined ? parseFloat(r.salarioProporcional) : parseFloat(f.salario);
+  var tl = {simples:'Falta simples', atestado:'Atestado médico', outro:'Justificado'};
 
   var linhas = '';
-  linhas += '<tr><td>Salário base'+(r.temRescisao?' ('+r.diasTrabalhados+'/'+r.diasMes+' dias)':' ('+r.diasMes+' dias)')+'</td><td class="num">'+fmt(salProp)+'</td></tr>';
+  linhas += '<tr><td>Salário base'+(r.temRescisao?' ('+r.diasTrabalhados+'/'+r.diasMes+' dias)':' ('+r.diasMes+' dias)')+'</td><td class="right">'+fmt(salProp)+'</td></tr>';
   if (r.temDireitoGratFixa) {
-    linhas += '<tr><td>Gratificação fixa R$ 300,00</td><td class="num '+(r.gratFixa>0?'pos':'neg')+'">'+(r.gratFixa>0?fmt(300):'cancelada')+'</td></tr>';
+    linhas += '<tr><td>Gratificação fixa R$ 300,00</td><td class="right '+(r.gratFixa>0?'pos':'neg')+'">'+(r.gratFixa>0?fmt(300):'cancelada')+'</td></tr>';
   }
   (f.grats||[]).forEach(function(g){
     var cancelada = r.temFalta||r.temRescisao;
-    linhas += '<tr><td>'+g.nome+'</td><td class="num '+(cancelada?'neg':'pos')+'">'+(cancelada?'cancelada':fmt(parseFloat(g.valor)))+'</td></tr>';
+    linhas += '<tr><td>'+g.nome+'</td><td class="right '+(cancelada?'neg':'pos')+'">'+(cancelada?'cancelada':fmt(parseFloat(g.valor)))+'</td></tr>';
   });
   if (r.faltasSimples.length>0) {
-    linhas += '<tr><td>Desconto por '+r.faltasSimples.length+' falta(s) simples</td><td class="num neg">- '+fmt(parseFloat(r.desconto))+'</td></tr>';
+    linhas += '<tr><td>Desconto por '+r.faltasSimples.length+' falta(s) simples</td><td class="right neg">- '+fmt(parseFloat(r.desconto))+'</td></tr>';
   }
   if (r.faltasJust.length>0) {
-    linhas += '<tr><td>Falta(s) justificada(s) — '+r.faltasJust.length+' dia(s)</td><td class="num" style="color:#b8860b">sem desconto</td></tr>';
+    linhas += '<tr><td>Falta(s) justificada(s) — '+r.faltasJust.length+' dia(s)</td><td class="right" style="color:#b8860b">sem desconto</td></tr>';
   }
   if (r.valorVale>0) {
     var valeObs = r.vale&&r.vale.data_vale ? ' — '+fmtData(r.vale.data_vale) : '';
     valeObs += r.vale&&r.vale.observacao ? ' ('+r.vale.observacao+')' : '';
-    linhas += '<tr><td>Vale'+valeObs+'</td><td class="num neg">- '+fmt(parseFloat(r.valorVale))+'</td></tr>';
+    linhas += '<tr><td>Vale'+valeObs+'</td><td class="right neg">- '+fmt(parseFloat(r.valorVale))+'</td></tr>';
   }
 
-  // Detalhe de faltas
-  var detFaltas = '';
-  if (r.faltasMes && r.faltasMes.length) {
-    detFaltas = '<div style="margin-top:8px;padding:8px;background:#fff8f8;border:1px solid #eee;border-radius:4px;font-size:10px">';
-    detFaltas += '<strong>Ocorrências:</strong><br>';
-    r.faltasMes.forEach(function(fa){
-      var tl={simples:'Falta simples',atestado:'Atestado médico',outro:'Justificado'};
-      detFaltas += fmtData(fa.data)+' — '+(tl[fa.tipo]||fa.tipo)+': '+fa.justificativa+'<br>';
-    });
-    detFaltas += '</div>';
-  }
-
-  // ── Monta o recibo profissional ──────────────────────────────
   function blocoRecibo(titulo) {
     var cpf = f.cpf || '—';
     var admissao = f.admissao ? fmtData(f.admissao) : '—';
     var depto = f.departamento || '—';
     var geradoEm = new Date().toLocaleDateString('pt-BR');
-
     return (
       '<div class="recibo">' +
-        // Cabeçalho
         '<div class="rec-header">' +
-          '<div class="rec-logo">' +
-            '<div class="rec-mra-box"><span class="rec-mra-sigla">MRA</span><span class="rec-mra-sub">MOCHILAS E BOLSAS</span></div>' +
-            '</div>' +
-          '</div>' +
+          '<div class="rec-mra-box"><span class="rec-mra-sigla">MRA</span><span class="rec-mra-sub">MOCHILAS E BOLSAS</span></div>' +
           '<div class="rec-titulo">' + titulo + '</div>' +
         '</div>' +
-
-        // Dados do funcionário
         '<div class="rec-section">' +
           '<div class="rec-section-title">DADOS DO FUNCIONÁRIO</div>' +
           '<div class="rec-grid">' +
-            '<div class="rec-field"><span class="rec-label">Nome completo</span><span class="rec-value bold">'+f.nome+'</span></div>' +
+            '<div class="rec-field"><span class="rec-label">Nome</span><span class="rec-value bold">'+f.nome+'</span></div>' +
             '<div class="rec-field"><span class="rec-label">CPF</span><span class="rec-value">'+cpf+'</span></div>' +
             '<div class="rec-field"><span class="rec-label">Cargo</span><span class="rec-value">'+f.cargo+'</span></div>' +
             '<div class="rec-field"><span class="rec-label">Departamento</span><span class="rec-value">'+depto+'</span></div>' +
-            '<div class="rec-field"><span class="rec-label">Data de admissão</span><span class="rec-value">'+admissao+'</span></div>' +
+            '<div class="rec-field"><span class="rec-label">Admissão</span><span class="rec-value">'+admissao+'</span></div>' +
             '<div class="rec-field"><span class="rec-label">Competência</span><span class="rec-value bold red">'+mesNome+(ano?' de '+ano:'')+'</span></div>' +
           '</div>' +
-          (r.temRescisao ? '<div class="rec-rescisao">⚠ Rescisão em ' + fmtData(r.dataRescisao) + ' — Trabalhados: ' + r.diasTrabalhados + ' de ' + r.diasMes + ' dias</div>' : '') +
+          (r.temRescisao ? '<div class="rec-rescisao">⚠ Rescisão em '+fmtData(r.dataRescisao)+' — '+r.diasTrabalhados+' de '+r.diasMes+' dias</div>' : '') +
         '</div>' +
-
-        // Tabela de valores
         '<div class="rec-section">' +
           '<div class="rec-section-title">DETALHAMENTO DE PAGAMENTO</div>' +
           '<table class="rec-table">' +
             '<thead><tr><th>Descrição</th><th class="right">Valor</th></tr></thead>' +
             '<tbody>' + linhas + '</tbody>' +
-            '<tfoot>' +
-              '<tr class="rec-total"><td>TOTAL LÍQUIDO A RECEBER</td><td class="right red bold">'+fmt(parseFloat(r.totalLiquido))+'</td></tr>' +
-            '</tfoot>' +
+            '<tfoot><tr class="rec-total"><td>TOTAL LÍQUIDO A RECEBER</td><td class="right red bold">'+fmt(parseFloat(r.totalLiquido))+'</td></tr></tfoot>' +
           '</table>' +
         '</div>' +
-
-        // Ocorrências
         (r.faltasMes && r.faltasMes.length ? (
           '<div class="rec-section">' +
             '<div class="rec-section-title">OCORRÊNCIAS DO MÊS</div>' +
             r.faltasMes.map(function(fa){
-              var tl={simples:'Falta simples',atestado:'Atestado médico',outro:'Justificado'};
-              return '<div class="rec-ocorrencia"><span class="rec-label">'+fmtData(fa.data)+'</span> <span class="rec-tipo-'+(fa.tipo==='simples'?'falta':'just')+'">'+tl[fa.tipo]+'</span> — '+fa.justificativa+'</div>';
+              return '<div class="rec-ocorrencia"><span style="font-weight:600">'+fmtData(fa.data)+'</span> <span class="rec-tipo-'+(fa.tipo==='simples'?'falta':'just')+'">'+(tl[fa.tipo]||fa.tipo)+'</span> — '+fa.justificativa+'</div>';
             }).join('') +
           '</div>'
         ) : '') +
-
-        // Assinatura
         '<div class="rec-assinatura">' +
           '<div class="rec-ass-texto">Declaro que recebi os valores acima discriminados, referentes à competência <strong>'+mesNome+(ano?' de '+ano:'')+'</strong>, estando de acordo com o presente recibo.</div>' +
           '<div class="rec-ass-grid">' +
-            '<div class="rec-ass-item">' +
-              '<div class="rec-ass-linha"></div>' +
-              '<div class="rec-ass-label">'+f.nome+'</div>' +
-              '<div class="rec-ass-sub">Assinatura do Funcionário</div>' +
-            '</div>' +
-            '<div class="rec-ass-item">' +
-              '<div class="rec-ass-linha"></div>' +
-              '<div class="rec-ass-label">Responsável pela Empresa</div>' +
-              '<div class="rec-ass-sub">Assinatura e Carimbo</div>' +
-            '</div>' +
-            '<div class="rec-ass-item">' +
-              '<div class="rec-ass-linha"></div>' +
-              '<div class="rec-ass-label">Data de recebimento</div>' +
-              '<div class="rec-ass-sub">____/____/________</div>' +
-            '</div>' +
+            '<div class="rec-ass-item"><div class="rec-ass-linha"></div><div class="rec-ass-label">'+f.nome+'</div><div class="rec-ass-sub">Assinatura do Funcionário</div></div>' +
+            '<div class="rec-ass-item"><div class="rec-ass-linha"></div><div class="rec-ass-label">Responsável pela Empresa</div><div class="rec-ass-sub">Assinatura e Carimbo</div></div>' +
+            '<div class="rec-ass-item"><div class="rec-ass-linha"></div><div class="rec-ass-label">Data de recebimento</div><div class="rec-ass-sub">____/____/________</div></div>' +
           '</div>' +
           '<div class="rec-rodape">Gerado em '+geradoEm+' — MRA Mochilas e Bolsas | Documento sem valor fiscal</div>' +
         '</div>' +
@@ -1073,14 +1050,13 @@ function imprimirFuncionario(funcId, btn) {
     );
   }
 
-  var html = '<html><head><meta charset="UTF-8"><title>Recibo — '+f.nome+'</title><style>' +
+  var html = '<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Recibo — '+f.nome+'</title><style>' +
     '*{box-sizing:border-box;margin:0;padding:0}' +
     'body{font-family:Arial,sans-serif;font-size:9px;color:#1a1a1a;background:#fff}' +
     '@page{size:A4;margin:0}' +
     '@media print{body{margin:0}}' +
-    '.pagina{width:210mm;min-height:297mm;margin:0;padding:0;display:flex;flex-direction:column}' +
-    '.recibo{flex:1;padding:8mm 12mm;display:flex;flex-direction:column;justify-content:center}' +
-    '.recibo:last-child{border-bottom:none}' +
+    '.pagina{width:100%;padding:0;display:flex;flex-direction:column}' +
+    '.recibo{flex:1;padding:8mm 12mm;display:flex;flex-direction:column}' +
     '.corte{display:flex;align-items:center;gap:6px;padding:0 12mm;flex-shrink:0}' +
     '.corte-linha{flex:1;border-top:1.5px dashed #999}' +
     '.corte-texto{font-size:8px;color:#999;letter-spacing:2px;white-space:nowrap;padding:0 4px}' +
@@ -1116,75 +1092,13 @@ function imprimirFuncionario(funcId, btn) {
     '.rec-rodape{text-align:center;font-size:7px;color:#bbb;margin-top:3px}' +
     '</style></head><body><div class="pagina">';
 
-  function blocoRecibo(titulo) {
-    var cpf = f.cpf || '—';
-    var admissao = f.admissao ? fmtData(f.admissao) : '—';
-    var depto = f.departamento || '—';
-    var geradoEm = new Date().toLocaleDateString('pt-BR');
-    var tl = {simples:'Falta simples',atestado:'Atestado médico',outro:'Justificado'};
-
-    return (
-      '<div class="recibo">' +
-        '<div class="rec-header">' +
-          '<div class="rec-mra-box"><span class="rec-mra-sigla">MRA</span><span class="rec-mra-sub">MOCHILAS E BOLSAS</span></div>' +
-          '<div class="rec-titulo">' + titulo + '</div>' +
-        '</div>' +
-
-        '<div class="rec-section">' +
-          '<div class="rec-section-title">DADOS DO FUNCIONÁRIO</div>' +
-          '<div class="rec-grid">' +
-            '<div class="rec-field"><span class="rec-label">Nome</span><span class="rec-value bold">'+f.nome+'</span></div>' +
-            '<div class="rec-field"><span class="rec-label">CPF</span><span class="rec-value">'+cpf+'</span></div>' +
-            '<div class="rec-field"><span class="rec-label">Cargo</span><span class="rec-value">'+f.cargo+'</span></div>' +
-            '<div class="rec-field"><span class="rec-label">Departamento</span><span class="rec-value">'+depto+'</span></div>' +
-            '<div class="rec-field"><span class="rec-label">Admissão</span><span class="rec-value">'+admissao+'</span></div>' +
-            '<div class="rec-field"><span class="rec-label">Competência</span><span class="rec-value bold red">'+mesNome+(ano?' de '+ano:'')+'</span></div>' +
-          '</div>' +
-          (r.temRescisao ? '<div class="rec-rescisao">⚠ Rescisão em '+fmtData(r.dataRescisao)+' — '+r.diasTrabalhados+' de '+r.diasMes+' dias</div>' : '') +
-        '</div>' +
-
-        '<div class="rec-section">' +
-          '<div class="rec-section-title">DETALHAMENTO DE PAGAMENTO</div>' +
-          '<table class="rec-table">' +
-            '<thead><tr><th>Descrição</th><th class="right">Valor</th></tr></thead>' +
-            '<tbody>' + linhas + '</tbody>' +
-            '<tfoot><tr class="rec-total"><td>TOTAL LÍQUIDO A RECEBER</td><td class="right red bold">'+fmt(parseFloat(r.totalLiquido))+'</td></tr></tfoot>' +
-          '</table>' +
-        '</div>' +
-
-        (r.faltasMes && r.faltasMes.length ? (
-          '<div class="rec-section">' +
-            '<div class="rec-section-title">OCORRÊNCIAS DO MÊS</div>' +
-            r.faltasMes.map(function(fa){
-              return '<div class="rec-ocorrencia"><span style="font-weight:600">'+fmtData(fa.data)+'</span> <span class="rec-tipo-'+(fa.tipo==='simples'?'falta':'just')+'">'+(tl[fa.tipo]||fa.tipo)+'</span> — '+fa.justificativa+'</div>';
-            }).join('') +
-          '</div>'
-        ) : '') +
-
-        '<div class="rec-assinatura">' +
-          '<div class="rec-ass-texto">Declaro que recebi os valores acima discriminados, referentes à competência <strong>'+mesNome+(ano?' de '+ano:'')+'</strong>, estando de acordo com o presente recibo.</div>' +
-          '<div class="rec-ass-grid">' +
-            '<div class="rec-ass-item"><div class="rec-ass-linha"></div><div class="rec-ass-label">'+f.nome+'</div><div class="rec-ass-sub">Assinatura do Funcionário</div></div>' +
-            '<div class="rec-ass-item"><div class="rec-ass-linha"></div><div class="rec-ass-label">Responsável pela Empresa</div><div class="rec-ass-sub">Assinatura e Carimbo</div></div>' +
-            '<div class="rec-ass-item"><div class="rec-ass-linha"></div><div class="rec-ass-label">Data de recebimento</div><div class="rec-ass-sub">____/____/________</div></div>' +
-          '</div>' +
-          '<div class="rec-rodape">Gerado em '+geradoEm+' — MRA Mochilas e Bolsas | Documento sem valor fiscal</div>' +
-        '</div>' +
-      '</div>'
-    );
-  }
-
   html += blocoRecibo('RECIBO DE PAGAMENTO — VIA DA EMPRESA');
   html += '<div class="corte"><div class="corte-linha"></div><span class="corte-texto">✂ RECORTE AQUI ✂</span><div class="corte-linha"></div></div>';
   html += blocoRecibo('RECIBO DE PAGAMENTO — VIA DO FUNCIONÁRIO');
+  html += '</div></body></html>';
 
-  var w = window.open('','_blank','width=800,height=700');
-  w.document.write(html);
-  w.document.close();
-  w.focus();
-  setTimeout(function(){ w.print(); }, 600);
+  _abrirJanela(html);
 }
-
 // ─── INIT ────────────────────────────────────────────────────
 
 (function(){
