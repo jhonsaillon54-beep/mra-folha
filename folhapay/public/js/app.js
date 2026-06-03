@@ -376,7 +376,7 @@ function renderValeFunc(busca) {
   if (!lista.length) { el.innerHTML='<div style="text-align:center;padding:1rem;color:var(--dim);font-size:13px">Nenhum funcionário encontrado.</div>'; return; }
   el.innerHTML = lista.map(function(f) {
     return '<label id="vfi-'+f.id+'" for="vfc-'+f.id+'" style="display:flex;align-items:center;gap:12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;transition:border-color .2s;cursor:pointer">' +
-      '<input type="checkbox" id="vfc-'+f.id+'" onchange="onValeCheck('+f.id+')" style="width:20px;height:20px;accent-color:var(--red);cursor:pointer;flex-shrink:0">' +
+      '<input type="checkbox" id="vfc-'+f.id+'" onchange="onValeCheck('+f.id+')" style="width:20px;height:20px;accent-color:#cc2222;cursor:pointer;flex-shrink:0;appearance:auto;-webkit-appearance:checkbox">' +
       '<div style="flex:1;min-width:0;pointer-events:none">' +
         '<div style="font-family:Rajdhani,sans-serif;font-size:15px;font-weight:700;color:var(--text)">'+f.nome+'</div>' +
         '<div style="font-size:12px;color:var(--muted)">'+f.cargo+(f.departamento?' — '+f.departamento:'')+'</div>' +
