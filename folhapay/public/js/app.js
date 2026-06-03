@@ -367,48 +367,52 @@ async function carregarSelectFuncs() {
   } catch(e){}
 }
 
+// ─── VALES — SELEÇÃO DE FUNCIONÁRIOS ────────────────────────
+// Abordagem: checkbox real com label, sem onclick no div
+
 function renderValeFunc(busca) {
   var el = document.getElementById('v-func-lista'); if (!el) return;
   var lista = _todosFunc.filter(function(f){ return f.nome.toLowerCase().includes((busca||'').toLowerCase()); });
   if (!lista.length) { el.innerHTML='<div style="text-align:center;padding:1rem;color:var(--dim);font-size:13px">Nenhum funcionário encontrado.</div>'; return; }
   el.innerHTML = lista.map(function(f) {
-    return '<div class="vale-func-item" id="vfi-'+f.id+'" style="display:flex;align-items:center;gap:12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;transition:border-color .2s;cursor:pointer" onclick="clicarValeFunc('+f.id+')">' +
-      '<input type="checkbox" id="vfc-'+f.id+'" style="width:20px;height:20px;accent-color:var(--red);cursor:pointer;flex-shrink:0;pointer-events:none">' +
-      '<div style="flex:1;min-width:0">' +
+    return '<label id="vfi-'+f.id+'" for="vfc-'+f.id+'" style="display:flex;align-items:center;gap:12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;transition:border-color .2s;cursor:pointer">' +
+      '<input type="checkbox" id="vfc-'+f.id+'" onchange="onValeCheck('+f.id+')" style="width:20px;height:20px;accent-color:var(--red);cursor:pointer;flex-shrink:0">' +
+      '<div style="flex:1;min-width:0;pointer-events:none">' +
         '<div style="font-family:Rajdhani,sans-serif;font-size:15px;font-weight:700;color:var(--text)">'+f.nome+'</div>' +
         '<div style="font-size:12px;color:var(--muted)">'+f.cargo+(f.departamento?' — '+f.departamento:'')+'</div>' +
       '</div>' +
       '<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">' +
-        '<span style="font-size:12px;color:var(--muted)">R$</span>' +
-        '<input type="number" id="vfv-'+f.id+'" placeholder="0,00" step="0.01" min="0" onclick="event.stopPropagation()" style="width:100px;opacity:.4;pointer-events:none" disabled>' +
+        '<span style="font-size:12px;color:var(--muted);pointer-events:none">R$</span>' +
+        '<input type="number" id="vfv-'+f.id+'" placeholder="0,00" step="0.01" min="0" ' +
+          'style="width:100px;opacity:.4;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:8px;color:var(--text);font-size:14px" ' +
+          'disabled ' +
+          'onclick="event.stopPropagation();event.preventDefault()" ' +
+          'onfocus="event.stopPropagation()">' +
       '</div>' +
-    '</div>';
+    '</label>';
   }).join('');
+
+  // Adiciona listener nos inputs de valor para não disparar o label
+  lista.forEach(function(f) {
+    var vinput = document.getElementById('vfv-'+f.id);
+    if (vinput) {
+      vinput.addEventListener('click', function(e){ e.stopPropagation(); });
+      vinput.addEventListener('focus', function(e){ e.stopPropagation(); });
+      vinput.addEventListener('mousedown', function(e){ e.stopPropagation(); });
+      vinput.addEventListener('touchstart', function(e){ e.stopPropagation(); }, {passive:true});
+    }
+  });
 }
 
-function clicarValeFunc(id) {
+function onValeCheck(id) {
   var cb = document.getElementById('vfc-'+id);
   var input = document.getElementById('vfv-'+id);
   var item = document.getElementById('vfi-'+id);
   if (!cb||!input||!item) return;
-  cb.checked = !cb.checked;
   input.disabled = !cb.checked;
   input.style.opacity = cb.checked ? '1' : '.4';
-  input.style.pointerEvents = cb.checked ? 'auto' : 'none';
   item.style.borderColor = cb.checked ? 'var(--red)' : 'var(--border)';
-  if (cb.checked) setTimeout(function(){ input.focus(); }, 50);
-}
-
-function toggleValeFunc(id) {
-  var cb = document.getElementById('vfc-'+id);
-  var input = document.getElementById('vfv-'+id);
-  var item = document.getElementById('vfi-'+id);
-  if (!cb||!input||!item) return;
-  input.disabled = !cb.checked;
-  input.style.opacity = cb.checked ? '1' : '.4';
-  input.style.pointerEvents = cb.checked ? 'auto' : 'none';
-  item.style.borderColor = cb.checked ? 'var(--red)' : 'var(--border)';
-  if (cb.checked) input.focus();
+  if (cb.checked) { setTimeout(function(){ input.focus(); }, 80); }
 }
 
 function aplicarValorUnico() {
@@ -422,7 +426,7 @@ function aplicarValorUnico() {
   if (!temSelecionado) {
     _todosFunc.forEach(function(f) {
       var cb=document.getElementById('vfc-'+f.id);
-      if (cb && !cb.checked) { cb.checked=true; toggleValeFunc(f.id); }
+      if (cb && !cb.checked) { cb.checked=true; onValeCheck(f.id); }
     });
   }
   var aplicados = 0;
@@ -443,14 +447,14 @@ function filtrarValeFunc() {
 function selecionarTodosVale() {
   _todosFunc.forEach(function(f) {
     var cb=document.getElementById('vfc-'+f.id);
-    if (cb&&!cb.checked) { cb.checked=true; toggleValeFunc(f.id); }
+    if (cb&&!cb.checked) { cb.checked=true; onValeCheck(f.id); }
   });
 }
 
 function deselecionarTodosVale() {
   _todosFunc.forEach(function(f) {
     var cb=document.getElementById('vfc-'+f.id);
-    if (cb&&cb.checked) { cb.checked=false; toggleValeFunc(f.id); }
+    if (cb&&cb.checked) { cb.checked=false; onValeCheck(f.id); }
   });
 }
 
@@ -577,7 +581,7 @@ function verFoto(src) {
   document.body.appendChild(ov);
 }
 
-// ─── VALES ───────────────────────────────────────────────────
+// ─── VALES — REGISTRAR ───────────────────────────────────────
 
 async function registrarVales() {
   var btn=document.getElementById('btn-vale');
@@ -773,7 +777,6 @@ function renderFolhaHTML(data) {
 function _abrirJanela(htmlConteudo) {
   var w = window.open('', '_blank');
   if (!w) { toast('Permita pop-ups para este site nas configurações do Safari.', 'err'); return; }
-
   var barra =
     '<div id="__barra" style="position:fixed;top:0;left:0;right:0;z-index:99999;background:#111;border-bottom:2px solid #cc2222;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;gap:10px;font-family:Arial,sans-serif">' +
       '<button onclick="window.close()" style="background:#2a2a2a;color:#f0f0f0;border:1px solid #3a3a3a;border-radius:6px;padding:8px 16px;font-size:14px;cursor:pointer">← Voltar</button>' +
@@ -781,11 +784,9 @@ function _abrirJanela(htmlConteudo) {
       '<button onclick="window.print()" style="background:#cc2222;color:#fff;border:none;border-radius:6px;padding:8px 16px;font-size:14px;cursor:pointer">⎙ Imprimir</button>' +
     '</div>' +
     '<div id="__espacador" style="height:56px"></div>';
-
   var html = htmlConteudo
     .replace('<body>', '<body>' + barra)
     .replace('</style>', '#__barra{display:flex!important}@media print{#__barra{display:none!important}#__espacador{display:none!important}}</style>');
-
   w.document.write(html);
   w.document.close();
   w.focus();
@@ -797,7 +798,6 @@ function imprimirFolha() {
   var mesNome = '', ano = '';
   if (mes) { var mp = mes.split('-'); ano = mp[0]; mesNome = mn[parseInt(mp[1])]; }
   var dias = diasDoMes(mes);
-
   var html = '<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>' +
     'body{font-family:Arial,sans-serif;font-size:11px;color:#000;margin:0;padding:20px}' +
     '.logo-box-print{display:inline-flex;flex-direction:column;align-items:center;border:2.5px solid #1a1a1a;border-radius:3px;padding:4px 14px;background:#fff;line-height:1;gap:1px;margin-bottom:8px}' +
@@ -812,12 +812,10 @@ function imprimirFolha() {
     '.total-row td{font-weight:700;border-top:2px solid #cc2222;background:#fff0f0}' +
     '.rodape{margin-top:20px;text-align:center;font-size:10px;color:#999;border-top:1px solid #eee;padding-top:10px}' +
     '</style></head><body>';
-
   html += '<div class="logo"><div class="logo-box-print"><span class="logo-sigla-print">MRA</span><span class="logo-sub-print">MOCHILAS E BOLSAS</span></div></div>';
   html += '<h1>Resumo da Folha de Pagamento</h1>';
   html += '<h2>'+mesNome+(ano?' de '+ano:'')+' — '+dias+' dias no mês — Gerado em: '+new Date().toLocaleDateString('pt-BR')+'</h2>';
   html += '<table><thead><tr><th>Funcionário</th><th>Cargo</th><th class="num">Salário</th><th class="num">Grat. Fixa</th><th class="num">Grat. Extra</th><th class="num">Desconto Falta</th><th class="num">Vale</th><th class="num">Total Líquido</th></tr></thead><tbody>';
-
   var totalGeral = 0;
   _dadosFolha.data.forEach(function(r) {
     var f = r.funcionario;
@@ -842,7 +840,6 @@ function imprimirFolha() {
   });
   html += '<tr class="total-row"><td colspan="7">TOTAL GERAL DA FOLHA</td><td class="num">'+fmt(totalGeral)+'</td></tr>';
   html += '</tbody></table><div class="rodape">MRA Mochilas e Bolsas — '+new Date().toLocaleString('pt-BR')+'</div></body></html>';
-
   _abrirJanela(html);
 }
 
@@ -850,14 +847,12 @@ function imprimirFuncionario(funcId) {
   if (!_dadosFolha) { toast('Gere a folha primeiro.', 'err'); return; }
   var r = _dadosFolha.data.find(function(r){ return r.funcionario.id === funcId; });
   if (!r) { toast('Funcionário não encontrado na folha.', 'err'); return; }
-
   var f = r.funcionario;
   var mes = document.getElementById('folha-mes').value;
   var mesNome = '', ano = '';
   if (mes) { var mp = mes.split('-'); ano = mp[0]; mesNome = mn[parseInt(mp[1])]; }
   var salProp = r.salarioProporcional !== undefined ? parseFloat(r.salarioProporcional) : parseFloat(f.salario);
   var tl = {simples:'Falta simples', atestado:'Atestado médico', outro:'Justificado'};
-
   var linhas = '';
   linhas += '<tr><td>Salário base'+(r.temRescisao?' ('+r.diasTrabalhados+'/'+r.diasMes+' dias)':' ('+r.diasMes+' dias)')+'</td><td class="right">'+fmt(salProp)+'</td></tr>';
   if (r.temDireitoGratFixa) {
@@ -874,7 +869,6 @@ function imprimirFuncionario(funcId) {
     valeObs += r.vale&&r.vale.observacao ? ' ('+r.vale.observacao+')' : '';
     linhas += '<tr><td>Vale'+valeObs+'</td><td class="right neg">- '+fmt(parseFloat(r.valorVale))+'</td></tr>';
   }
-
   var css =
     '*{box-sizing:border-box;margin:0;padding:0}' +
     'body{font-family:Arial,sans-serif;font-size:9px;color:#1a1a1a;background:#fff}' +
@@ -911,7 +905,6 @@ function imprimirFuncionario(funcId) {
     '.rec-ass-item{text-align:center}.rec-ass-linha{border-bottom:1px solid #333;height:14px;margin-bottom:2px}' +
     '.rec-ass-label{font-size:7.5px;font-weight:600;color:#333}.rec-ass-sub{font-size:7px;color:#888}' +
     '.rec-rodape{text-align:center;font-size:7px;color:#bbb;margin-top:3px}';
-
   function blocoRecibo(titulo) {
     var cpf = f.cpf||'—', admissao = f.admissao?fmtData(f.admissao):'—', depto = f.departamento||'—';
     var geradoEm = new Date().toLocaleDateString('pt-BR');
@@ -953,13 +946,11 @@ function imprimirFuncionario(funcId) {
       '</div>' +
     '</div>';
   }
-
   var html = '<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Recibo — '+f.nome+'</title><style>'+css+'</style></head><body><div class="pagina">';
   html += blocoRecibo('RECIBO DE PAGAMENTO — VIA DA EMPRESA');
   html += '<div class="corte"><div class="corte-linha"></div><span class="corte-texto">✂ RECORTE AQUI ✂</span><div class="corte-linha"></div></div>';
   html += blocoRecibo('RECIBO DE PAGAMENTO — VIA DO FUNCIONÁRIO');
   html += '</div></body></html>';
-
   _abrirJanela(html);
 }
 
