@@ -868,9 +868,9 @@ function imprimirFuncionario(funcId) {
     'body{font-family:Arial,sans-serif;font-size:9px;color:#1a1a1a;background:#fff}' +
     '@page{size:A4;margin:0}' +
     '@media print{body{margin:0}html,body{height:100%}}' +
-    '.pagina{width:210mm;height:297mm;display:flex;flex-direction:column;overflow:hidden}' +
-    '.recibo{flex:1;padding:6mm 12mm;display:flex;flex-direction:column;justify-content:space-between;height:50%;max-height:50%}' +
-    '.corte{display:flex;align-items:center;gap:6px;padding:0 12mm;flex-shrink:0;height:6mm}' +
+    '.pagina{width:210mm;height:297mm;display:flex;flex-direction:column;overflow:hidden;page-break-inside:avoid}' +
+    '.recibo{width:210mm;height:142mm;padding:5mm 12mm;display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}' +
+    '.corte{display:flex;align-items:center;gap:6px;padding:0 12mm;height:13mm;flex-shrink:0}' +
     '.corte-linha{flex:1;border-top:1.5px dashed #999}' +
     '.corte-texto{font-size:8px;color:#999;letter-spacing:2px;white-space:nowrap;padding:0 4px}' +
     '.rec-header{display:flex;justify-content:space-between;align-items:center;padding-bottom:3px;border-bottom:2px solid #cc2222;margin-bottom:4px}' +
@@ -899,7 +899,7 @@ function imprimirFuncionario(funcId) {
     '.rec-ass-item{text-align:center}.rec-ass-linha{border-bottom:1px solid #333;height:14px;margin-bottom:2px}' +
     '.rec-ass-label{font-size:7.5px;font-weight:600;color:#333}.rec-ass-sub{font-size:7px;color:#888}' +
     '.rec-rodape{text-align:center;font-size:7px;color:#bbb;margin-top:3px}';
-    
+
   function blocoRecibo(titulo) {
     var cpf = f.cpf||'—', admissao = f.admissao?fmtData(f.admissao):'—', depto = f.departamento||'—';
     var geradoEm = new Date().toLocaleDateString('pt-BR');
