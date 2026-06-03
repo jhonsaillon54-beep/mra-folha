@@ -2,6 +2,8 @@ const API = '';
 
 // ─── UTILS ──────────────────────────────────────────────────
 
+var mn = ['','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
 function fmt(v) {
   return 'R$ ' + Number(v).toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 }
@@ -92,36 +94,21 @@ function maskData(el) {
 function abrirCalendario(inputId) {
   var input = document.getElementById(inputId);
   if (!input) return;
-
-  // Remove picker antigo se existir
   var antigo = document.getElementById('hidden-date-picker');
   if (antigo) antigo.remove();
-
-  // Posição do input em relação à viewport (sem scroll)
   var rect = input.getBoundingClientRect();
-
   var picker = document.createElement('input');
   picker.type = 'date';
   picker.id = 'hidden-date-picker';
-  // Usar position:fixed com as coordenadas da viewport
   picker.style.cssText = [
-    'position:fixed',
-    'opacity:0',
-    'pointer-events:none',
-    'top:' + rect.bottom + 'px',
-    'left:' + rect.left + 'px',
-    'width:' + rect.width + 'px',
-    'height:1px',
-    'z-index:9999',
-    'border:none',
-    'padding:0',
-    'background:transparent'
+    'position:fixed','opacity:0','pointer-events:none',
+    'top:' + rect.bottom + 'px','left:' + rect.left + 'px',
+    'width:' + rect.width + 'px','height:1px','z-index:9999',
+    'border:none','padding:0','background:transparent'
   ].join(';');
   document.body.appendChild(picker);
-
   var atual = toISO(input.value);
   if (atual) picker.value = atual;
-
   picker.onchange = function() {
     if (picker.value) {
       var p = picker.value.split('-');
@@ -129,18 +116,12 @@ function abrirCalendario(inputId) {
     }
     setTimeout(function(){ picker.remove(); }, 100);
   };
-
   picker.addEventListener('blur', function() {
     setTimeout(function(){ if(document.getElementById('hidden-date-picker')) picker.remove(); }, 300);
   });
-
   setTimeout(function() {
-    try {
-      if (picker.showPicker) picker.showPicker();
-      else picker.click();
-    } catch(e) {
-      picker.click();
-    }
+    try { if (picker.showPicker) picker.showPicker(); else picker.click(); }
+    catch(e) { picker.click(); }
   }, 30);
 }
 
@@ -208,7 +189,6 @@ async function cadastrar() {
   if (!nome||!cpf||!cargo||isNaN(sal)||sal<=0){toast('Preencha Nome, CPF, Cargo e Salário.','err');return;}
   btn.classList.add('loading'); btn.disabled=true;
   try {
-    // Se toggle auxiliar ativo, adiciona R$200 nas grats automáticas
     var gratsEnviar = [...gratsTemp];
     if (grat_aux && !gratsEnviar.find(function(g){return g.nome==='Gratificação Auxiliar';})) {
       gratsEnviar.unshift({nome:'Gratificação Auxiliar', valor:200});
@@ -244,7 +224,6 @@ function renderFuncionarios(lista) {
   var el = document.getElementById('lista-funcionarios'); if(!el) return;
   var filtrado = lista.filter(function(f){return f.nome.toLowerCase().includes(busca);});
   if (!filtrado.length) { el.innerHTML='<div class="empty"><div class="empty-icon">◈</div>Nenhum encontrado.</div>'; return; }
-
   var html = '<div class="stagger">';
   filtrado.forEach(function(f) {
     var sal = parseFloat(f.salario);
@@ -252,7 +231,6 @@ function renderFuncionarios(lista) {
     var gratsHtml = '';
     if (f.grat_fixa) gratsHtml += '<span class="badge badge-ok">✓ Grat. fixa R$ 300,00</span>';
     (f.grats||[]).forEach(function(g){ gratsHtml+='<span class="badge badge-info">'+g.nome+': '+fmt(parseFloat(g.valor))+'</span>'; });
-
     html += '<div class="emp-card animate-in" id="func-'+f.id+'">' +
       '<div class="row r-btw">' +
         '<div style="flex:1;min-width:0">' +
@@ -304,7 +282,6 @@ async function abrirEdicao(id) {
     var ov = document.createElement('div');
     ov.id = 'modal-edicao';
     ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.82);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:9998;padding:1rem;overflow-y:auto;';
-
     ov.innerHTML =
       '<div class="modal-edicao-box animate-scale">' +
         '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;padding-bottom:.75rem;border-bottom:1px solid var(--border)">' +
@@ -345,7 +322,6 @@ async function abrirEdicao(id) {
           '</button>' +
         '</div>' +
       '</div>';
-
     document.body.appendChild(ov);
     ov.addEventListener('click', function(e){if(e.target===ov) fecharEdicao();});
   } catch(e){ toast('Erro ao carregar funcionário.','err'); }
@@ -396,7 +372,6 @@ function renderValeFunc(busca) {
   var lista = _todosFunc.filter(function(f){ return f.nome.toLowerCase().includes((busca||'').toLowerCase()); });
   if (!lista.length) { el.innerHTML='<div style="text-align:center;padding:1rem;color:var(--dim);font-size:13px">Nenhum funcionário encontrado.</div>'; return; }
   el.innerHTML = lista.map(function(f) {
-    var sal = parseFloat(f.salario);
     return '<div class="vale-func-item" id="vfi-'+f.id+'" style="display:flex;align-items:center;gap:12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;transition:border-color .2s">' +
       '<input type="checkbox" id="vfc-'+f.id+'" class="vale-check" onchange="toggleValeFunc('+f.id+')" style="width:16px;height:16px;accent-color:var(--red);cursor:pointer;flex-shrink:0">' +
       '<div style="flex:1;min-width:0">' +
@@ -427,32 +402,24 @@ function aplicarValorUnico() {
   var el = document.getElementById('v-valor-unico');
   var val = parseFloat(el ? el.value : 0);
   if (isNaN(val) || val <= 0) { toast('Informe um valor válido no campo acima.', 'err'); return; }
-  
-  // Verifica se tem alguém selecionado; se não, seleciona todos
   var temSelecionado = _todosFunc.some(function(f) {
     var cb = document.getElementById('vfc-'+f.id);
     return cb && cb.checked;
   });
   if (!temSelecionado) {
-    // Seleciona todos primeiro
     _todosFunc.forEach(function(f) {
       var cb=document.getElementById('vfc-'+f.id);
       if (cb && !cb.checked) { cb.checked=true; toggleValeFunc(f.id); }
     });
   }
-
   var aplicados = 0;
   _todosFunc.forEach(function(f) {
     var cb = document.getElementById('vfc-'+f.id);
     var vinput = document.getElementById('vfv-'+f.id);
-    if (cb && cb.checked && vinput) {
-      vinput.value = val.toFixed(2);
-      aplicados++;
-    }
+    if (cb && cb.checked && vinput) { vinput.value = val.toFixed(2); aplicados++; }
   });
-  
   if (aplicados === 0) toast('Nenhum funcionário disponível.', 'err');
-  else toast(fmt(val) + ' aplicado para ' + aplicados + ' funcionário(s)! Clique em "Registrar vales" para salvar.', 'ok');
+  else toast(fmt(val) + ' aplicado para ' + aplicados + ' funcionário(s)!', 'ok');
 }
 
 function filtrarValeFunc() {
@@ -480,10 +447,8 @@ function setTipo(tipo) {
   tipoFalta = tipo;
   document.querySelectorAll('.tipo-btn').forEach(function(b){b.classList.remove('sel');});
   var el=document.getElementById('tipo-'+tipo); if(el) el.classList.add('sel');
-  // Mostrar campo de foto só para atestado
   var campoFoto = document.getElementById('campo-foto-atestado');
   if (campoFoto) campoFoto.style.display = tipo==='atestado' ? 'flex' : 'none';
-  // Limpar foto se trocar de tipo
   if (tipo !== 'atestado') removerFoto();
 }
 
@@ -496,16 +461,11 @@ function previewFoto(input) {
     var placeholder = document.getElementById('upload-placeholder');
     var img = document.getElementById('preview-img');
     if (file.type === 'application/pdf') {
-      img.src = '';
-      img.style.display = 'none';
+      img.src = ''; img.style.display = 'none';
       prev.innerHTML = '<div style="padding:20px;text-align:center"><div style="font-size:40px">📄</div><div style="font-size:13px;color:var(--warn);margin-top:8px">'+file.name+'</div><div style="font-size:11px;color:var(--muted)">PDF selecionado</div><button onclick="event.stopPropagation();removerFoto()" style="margin-top:8px;background:#cc2222;color:#fff;border:none;border-radius:4px;padding:4px 12px;cursor:pointer">✕ Remover</button></div>';
-    } else {
-      img.src = e.target.result;
-      img.style.display = 'block';
-    }
+    } else { img.src = e.target.result; img.style.display = 'block'; }
     if (prev) prev.style.display = 'block';
     if (placeholder) placeholder.style.display = 'none';
-    // Guardar base64
     window._fotoAtestado = e.target.result;
   };
   reader.readAsDataURL(file);
@@ -513,11 +473,9 @@ function previewFoto(input) {
 
 function removerFoto() {
   window._fotoAtestado = null;
-  var input = document.getElementById('f-foto');
-  if (input) input.value = '';
+  var input = document.getElementById('f-foto'); if (input) input.value = '';
   var prev = document.getElementById('upload-preview');
   var placeholder = document.getElementById('upload-placeholder');
-  var img = document.getElementById('preview-img');
   if (prev) { prev.style.display='none'; prev.innerHTML='<img id="preview-img" style="max-width:100%;max-height:200px;border-radius:4px;object-fit:contain"><button onclick="event.stopPropagation();removerFoto()" style="position:absolute;top:4px;right:4px;background:#cc2222;color:#fff;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:14px;line-height:1">✕</button>'; }
   if (placeholder) placeholder.style.display = 'block';
 }
@@ -528,12 +486,8 @@ function handleDrop(event) {
   if (files && files[0]) {
     var input = document.getElementById('f-foto');
     if (input) {
-      // Criar DataTransfer para atribuir o arquivo
       try {
-        var dt = new DataTransfer();
-        dt.items.add(files[0]);
-        input.files = dt.files;
-        previewFoto(input);
+        var dt = new DataTransfer(); dt.items.add(files[0]); input.files = dt.files; previewFoto(input);
       } catch(e) { toast('Arraste não suportado. Use o botão para selecionar.', 'info'); }
     }
   }
@@ -553,8 +507,7 @@ async function registrarFalta() {
     await api('POST','/faltas',{funcionario_id:funcId,data:dataISO,tipo:tipoFalta,justificativa:just,foto_atestado:foto});
     toast('Falta registrada!','ok');
     document.getElementById('f-data').value=''; document.getElementById('f-just').value='';
-    removerFoto();
-    setTipo('simples'); carregarFaltas();
+    removerFoto(); setTipo('simples'); carregarFaltas();
   } catch(e){} finally { btn.classList.remove('loading'); btn.disabled=false; }
 }
 
@@ -620,8 +573,6 @@ async function registrarVales() {
   var data_vale=toISO(dataRaw);
   var obs=document.getElementById('v-obs').value.trim();
   if (!mes){toast('Selecione o mês de referência.','err');return;}
-
-  // Coletar funcionários selecionados
   var selecionados = [];
   _todosFunc.forEach(function(f){
     var cb=document.getElementById('vfc-'+f.id);
@@ -632,24 +583,19 @@ async function registrarVales() {
       selecionados.push({id:f.id, nome:f.nome, valor:val});
     }
   });
-
   if (!selecionados.length){toast('Selecione pelo menos um funcionário.','err');return;}
-
   btn.classList.add('loading'); btn.disabled=true;
   try {
     var erros=0, ok=0;
     for (var i=0;i<selecionados.length;i++) {
-      try {
-        await api('POST','/vales',{funcionario_id:selecionados[i].id,mes,valor:selecionados[i].valor,observacao:obs,data_vale});
-        ok++;
-      } catch(e){ erros++; }
+      try { await api('POST','/vales',{funcionario_id:selecionados[i].id,mes,valor:selecionados[i].valor,observacao:obs,data_vale}); ok++; }
+      catch(e){ erros++; }
     }
     if (ok>0) toast(ok+' vale(s) registrado(s) com sucesso!','ok');
     if (erros>0) toast(erros+' vale(s) com erro.','err');
     document.getElementById('v-obs').value='';
     var vd=document.getElementById('v-data'); if(vd) vd.value='';
-    deselecionarTodosVale();
-    carregarVales();
+    deselecionarTodosVale(); carregarVales();
   } catch(e){} finally { btn.classList.remove('loading'); btn.disabled=false; }
 }
 
@@ -665,15 +611,11 @@ async function carregarVales() {
 function renderVales(lista) {
   var el=document.getElementById('lista-vales'); if(!el) return;
   if (!lista.length){el.innerHTML='<div class="empty"><div class="empty-icon">💵</div>Nenhum vale.</div>';return;}
-  var mn=['','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
   var html='<div class="stagger">';
   lista.forEach(function(v){
     var p=v.mes.split('-'); var mesNome=mn[parseInt(p[1])]+'/'+p[0];
-    // Formatar data_vale corretamente
     var dataFormatada = '';
-    if (v.data_vale && v.data_vale.trim() !== '') {
-      dataFormatada = fmtData(v.data_vale.trim());
-    }
+    if (v.data_vale && v.data_vale.trim() !== '') { dataFormatada = fmtData(v.data_vale.trim()); }
     html+='<div class="vale-card animate-in" id="vale-'+v.id+'">'+
       '<div style="flex:1;min-width:0">'+
         '<div class="row" style="gap:10px;margin-bottom:6px;flex-wrap:wrap;align-items:center">'+
@@ -710,7 +652,7 @@ var _dadosFolha = null;
 function filtrarFolha() {
   if (!_dadosFolha) return;
   var busca = (document.getElementById('folha-busca')?document.getElementById('folha-busca').value:'').toLowerCase();
-  var filtrado = { ok: _dadosFolha.ok, total_geral: _dadosFolha.total_geral, mes: _dadosFolha.mes, diasMes: _dadosFolha.diasMes, data: _dadosFolha.data.filter(function(r){ return r.funcionario.nome.toLowerCase().includes(busca); }) };
+  var filtrado = { ok:_dadosFolha.ok, total_geral:_dadosFolha.total_geral, mes:_dadosFolha.mes, diasMes:_dadosFolha.diasMes, data:_dadosFolha.data.filter(function(r){ return r.funcionario.nome.toLowerCase().includes(busca); }) };
   renderFolhaHTML(filtrado);
 }
 
@@ -720,20 +662,15 @@ async function gerarFolha() {
   var dias=diasDoMes(mes);
   var funcId=document.getElementById('folha-func').value;
   var el=document.getElementById('folha-resultado');
-
   btn.classList.add('loading'); btn.disabled=true;
   el.innerHTML='<div class="stagger">'+Array(3).fill('<div class="skeleton" style="height:120px;margin-bottom:12px"></div>').join('')+'</div>';
-
   try {
     var path='/folha?dias_mes='+dias;
     if (mes)    path+='&mes='+mes;
     if (funcId) path+='&funcionario_id='+funcId;
     var data=await api('GET',path);
     _dadosFolha = data;
-
-    if (!data.data.length){
-      el.innerHTML='<div class="empty"><div class="empty-icon">◈</div>Nenhum funcionário.</div>'; return;
-    }
+    if (!data.data.length){ el.innerHTML='<div class="empty"><div class="empty-icon">◈</div>Nenhum funcionário.</div>'; return; }
     renderFolhaHTML(data);
   } catch(e) {
     el.innerHTML='<div class="empty"><div class="empty-icon">!</div>Erro ao gerar folha.</div>';
@@ -744,153 +681,106 @@ function renderFolhaHTML(data) {
   var el=document.getElementById('folha-resultado'); if(!el) return;
   var mes=document.getElementById('folha-mes').value;
   var dias=diasDoMes(mes);
-  if (!data.data.length){
-    el.innerHTML='<div class="empty"><div class="empty-icon">◈</div>Nenhum funcionário encontrado.</div>'; return;
+  if (!data.data.length){ el.innerHTML='<div class="empty"><div class="empty-icon">◈</div>Nenhum funcionário encontrado.</div>'; return; }
+  var mesNome='', ano='';
+  if (mes){ var mp=mes.split('-'); ano=mp[0]; mesNome=mn[parseInt(mp[1])]; }
+  var tl={simples:'Falta simples',atestado:'Atestado médico',outro:'Motivo justificado'};
+  var html='';
+  if (mes) {
+    html+='<div style="text-align:center;margin-bottom:1.5rem;animation:fadeIn .3s ease">'+
+      '<div style="font-family:Rajdhani,sans-serif;font-size:24px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--gray-l)">'+mesNome+' '+ano+'</div>'+
+      '<div style="font-size:13px;color:var(--dim);margin-top:2px">'+dias+' dias no mês</div>'+
+    '</div>';
   }
-
-    var mn=['','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-    var mesNome='', ano='';
-    if (mes){ var mp=mes.split('-'); ano=mp[0]; mesNome=mn[parseInt(mp[1])]; }
-    var tl={simples:'Falta simples',atestado:'Atestado médico',outro:'Motivo justificado'};
-
-    var html='';
-    if (mes) {
-      html+='<div style="text-align:center;margin-bottom:1.5rem;animation:fadeIn .3s ease">'+
-        '<div style="font-family:Rajdhani,sans-serif;font-size:24px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--gray-l)">'+mesNome+' '+ano+'</div>'+
-        '<div style="font-size:13px;color:var(--dim);margin-top:2px">'+dias+' dias no mês</div>'+
-      '</div>';
+  data.data.forEach(function(r, idx) {
+    var f = r.funcionario;
+    var sal = parseFloat(f.salario);
+    var sb='';
+    if (r.temRescisao) sb='<span class="badge badge-red">⚠ Rescisão '+fmtData(r.dataRescisao)+'</span>';
+    else if (r.faltasMes.length===0) sb='<span class="badge badge-ok">✓ Sem faltas</span>';
+    else if (r.faltasSimples.length>0) sb='<span class="badge badge-red">✕ '+r.faltasSimples.length+' falta(s)</span>'+(r.faltasJust.length?' <span class="badge badge-warn">✦ '+r.faltasJust.length+' justif.</span>':'');
+    else sb='<span class="badge badge-warn">✦ '+r.faltasJust.length+' justif.</span>';
+    var salProp = r.salarioProporcional !== undefined ? parseFloat(r.salarioProporcional) : sal;
+    var lblSal = r.temRescisao ? 'Salário proporcional ('+r.diasTrabalhados+'/'+r.diasMes+' dias)' : 'Salário base ('+r.diasMes+' dias)';
+    var gfHtml='';
+    if (r.temDireitoGratFixa) {
+      gfHtml='<div class="folha-row"><span class="lbl">Gratificação fixa R$ 300,00</span><span class="val '+(r.gratFixa>0?'pos':'cut')+'">'+(r.gratFixa>0?fmt(300):'R$ 300,00 — cancelada')+'</span></div>';
     }
-
-    data.data.forEach(function(r, idx) {
-      var f = r.funcionario;
-      var sal = parseFloat(f.salario);
-
-      // Badge de status
-      var sb='';
-      if (r.temRescisao) sb='<span class="badge badge-red">⚠ Rescisão '+fmtData(r.dataRescisao)+'</span>';
-      else if (r.faltasMes.length===0) sb='<span class="badge badge-ok">✓ Sem faltas</span>';
-      else if (r.faltasSimples.length>0) sb='<span class="badge badge-red">✕ '+r.faltasSimples.length+' falta(s)</span>'+(r.faltasJust.length?' <span class="badge badge-warn">✦ '+r.faltasJust.length+' justif.</span>':'');
-      else sb='<span class="badge badge-warn">✦ '+r.faltasJust.length+' justif.</span>';
-
-      // Linha salário
-      var salProp = r.salarioProporcional !== undefined ? parseFloat(r.salarioProporcional) : sal;
-      var lblSal = r.temRescisao
-        ? 'Salário proporcional ('+r.diasTrabalhados+'/'+r.diasMes+' dias)'
-        : 'Salário base ('+r.diasMes+' dias)';
-
-      // Grat fixa
-      var gfHtml='';
-      if (r.temDireitoGratFixa) {
-        gfHtml='<div class="folha-row"><span class="lbl">Gratificação fixa R$ 300,00</span>'+
-          '<span class="val '+(r.gratFixa>0?'pos':'cut')+'">'+
-          (r.gratFixa>0?fmt(300):'R$ 300,00 — cancelada')+
-          '</span></div>';
-      }
-
-      // Grats extras
-      var geHtml='';
-      (f.grats||[]).forEach(function(g){
-        var cancelada = r.temFalta||r.temRescisao;
-        geHtml+='<div class="folha-row"><span class="lbl">'+g.nome+'</span>'+
-          '<span class="val '+(cancelada?'cut':'pos')+'">'+fmt(parseFloat(g.valor))+(cancelada?' — cancelada':'')+
-          '</span></div>';
-      });
-
-      // Desconto faltas
-      var descHtml='';
-      if (r.faltasSimples.length>0) {
-        descHtml='<div class="folha-row"><span class="lbl">Desconto '+r.faltasSimples.length+' falta(s) simples <span style="font-size:11px;opacity:.55">('+fmt(sal)+' ÷ '+r.diasMes+' × '+r.faltasSimples.length+')</span></span><span class="val neg">- '+fmt(parseFloat(r.desconto))+'</span></div>';
-      }
-
-      // Faltas justificadas
-      var jHtml='';
-      if (r.faltasJust.length>0) {
-        jHtml='<div class="folha-row"><span class="lbl">Falta(s) justificada(s) — '+r.faltasJust.length+' dia(s)</span><span class="val warn">Sem desconto</span></div>';
-      }
-
-      // Vale
-      var vHtml='';
-      if (r.valorVale>0) {
-        var vObs=(r.vale&&r.vale.data_vale?' — '+fmtData(r.vale.data_vale):'')+(r.vale&&r.vale.observacao?' ('+r.vale.observacao+')':'');
-        vHtml='<div class="folha-row"><span class="lbl">💵 Vale'+vObs+'</span><span class="val neg">- '+fmt(parseFloat(r.valorVale))+'</span></div>';
-      }
-
-      // Detalhe faltas
-      var dfHtml='';
-      if (r.faltasMes&&r.faltasMes.length) {
-        dfHtml='<div class="folha-faltas-detail"><div class="folha-falta-title">Detalhamento das faltas</div>'+
-          r.faltasMes.map(function(fa){
-            return '<div class="folha-falta-line"><span class="dt">'+fmtData(fa.data)+'</span><span class="tp '+(fa.tipo==='simples'?'s':'j')+'">'+(tl[fa.tipo]||fa.tipo)+'</span><span>'+fa.justificativa+'</span></div>';
-          }).join('')+
-        '</div>';
-      }
-
-      // Banner rescisão
-      var rBanner='';
-      if (r.temRescisao) {
-        rBanner='<div style="background:rgba(204,34,34,0.1);border-left:3px solid var(--red);padding:10px 16px;margin:0;font-size:13px">'+
-          '<span style="color:var(--red-l);font-weight:600">⚠ Rescisão em '+fmtData(r.dataRescisao)+'</span>'+
-          ' &nbsp;|&nbsp; <span style="color:var(--muted)">Trabalhados: '+r.diasTrabalhados+' de '+r.diasMes+' dias</span>'+
-        '</div>';
-      }
-
-      html+='<div class="folha-block" style="animation-delay:'+(idx*0.07)+'s">'+
-        '<div class="folha-header">'+
-          '<div><div class="folha-nome">'+f.nome+'</div><div class="folha-cargo">'+f.cargo+(f.departamento?' — '+f.departamento:'')+'</div></div>'+
-          '<div class="row" style="gap:8px">'+sb+'<button class="btn btn-sm no-print" onclick="imprimirFuncionario('+f.id+', this)">⎙ Imprimir</button></div>'+
-        '</div>'+
-        rBanner+
-        '<div class="folha-body">'+
-          '<div class="folha-row"><span class="lbl">'+lblSal+'</span><span class="val">'+fmt(salProp)+'</span></div>'+
-          gfHtml+geHtml+descHtml+jHtml+vHtml+
-        '</div>'+
-        '<div class="folha-total"><div class="lbl">Total líquido</div><div class="val">'+fmt(parseFloat(r.totalLiquido))+'</div></div>'+
-        dfHtml+
-      '</div>';
+    var geHtml='';
+    (f.grats||[]).forEach(function(g){
+      var cancelada = r.temFalta||r.temRescisao;
+      geHtml+='<div class="folha-row"><span class="lbl">'+g.nome+'</span><span class="val '+(cancelada?'cut':'pos')+'">'+fmt(parseFloat(g.valor))+(cancelada?' — cancelada':'')+'</span></div>';
     });
-
-    if (data.data.length>1) {
-      html+='<div class="total-geral"><div class="lbl">Total geral da folha</div><div class="val">'+fmt(parseFloat(data.total_geral))+'</div></div>';
+    var descHtml='';
+    if (r.faltasSimples.length>0) {
+      descHtml='<div class="folha-row"><span class="lbl">Desconto '+r.faltasSimples.length+' falta(s) simples <span style="font-size:11px;opacity:.55">('+fmt(sal)+' ÷ '+r.diasMes+' × '+r.faltasSimples.length+')</span></span><span class="val neg">- '+fmt(parseFloat(r.desconto))+'</span></div>';
     }
-
-    el.innerHTML=html;
+    var jHtml='';
+    if (r.faltasJust.length>0) { jHtml='<div class="folha-row"><span class="lbl">Falta(s) justificada(s) — '+r.faltasJust.length+' dia(s)</span><span class="val warn">Sem desconto</span></div>'; }
+    var vHtml='';
+    if (r.valorVale>0) {
+      var vObs=(r.vale&&r.vale.data_vale?' — '+fmtData(r.vale.data_vale):'')+(r.vale&&r.vale.observacao?' ('+r.vale.observacao+')':'');
+      vHtml='<div class="folha-row"><span class="lbl">💵 Vale'+vObs+'</span><span class="val neg">- '+fmt(parseFloat(r.valorVale))+'</span></div>';
+    }
+    var dfHtml='';
+    if (r.faltasMes&&r.faltasMes.length) {
+      dfHtml='<div class="folha-faltas-detail"><div class="folha-falta-title">Detalhamento das faltas</div>'+
+        r.faltasMes.map(function(fa){
+          return '<div class="folha-falta-line"><span class="dt">'+fmtData(fa.data)+'</span><span class="tp '+(fa.tipo==='simples'?'s':'j')+'">'+(tl[fa.tipo]||fa.tipo)+'</span><span>'+fa.justificativa+'</span></div>';
+        }).join('')+'</div>';
+    }
+    var rBanner='';
+    if (r.temRescisao) {
+      rBanner='<div style="background:rgba(204,34,34,0.1);border-left:3px solid var(--red);padding:10px 16px;margin:0;font-size:13px">'+
+        '<span style="color:var(--red-l);font-weight:600">⚠ Rescisão em '+fmtData(r.dataRescisao)+'</span>'+
+        ' &nbsp;|&nbsp; <span style="color:var(--muted)">Trabalhados: '+r.diasTrabalhados+' de '+r.diasMes+' dias</span></div>';
+    }
+    html+='<div class="folha-block" style="animation-delay:'+(idx*0.07)+'s">'+
+      '<div class="folha-header">'+
+        '<div><div class="folha-nome">'+f.nome+'</div><div class="folha-cargo">'+f.cargo+(f.departamento?' — '+f.departamento:'')+'</div></div>'+
+        '<div class="row" style="gap:8px">'+sb+'<button class="btn btn-sm no-print" onclick="imprimirFuncionario('+f.id+')">⎙ Imprimir</button></div>'+
+      '</div>'+
+      rBanner+
+      '<div class="folha-body">'+
+        '<div class="folha-row"><span class="lbl">'+lblSal+'</span><span class="val">'+fmt(salProp)+'</span></div>'+
+        gfHtml+geHtml+descHtml+jHtml+vHtml+
+      '</div>'+
+      '<div class="folha-total"><div class="lbl">Total líquido</div><div class="val">'+fmt(parseFloat(r.totalLiquido))+'</div></div>'+
+      dfHtml+
+    '</div>';
+  });
+  if (data.data.length>1) {
+    html+='<div class="total-geral"><div class="lbl">Total geral da folha</div><div class="val">'+fmt(parseFloat(data.total_geral))+'</div></div>';
+  }
   el.innerHTML=html;
 }
-// ─── IMPRESSÃO ──────────────────────────────────────────────
 
-// ─── IMPRESSÃO — PATCH MOBILE-FRIENDLY ──────────────────────
-// Substitua as funções imprimirFolha e imprimirFuncionario no app.js por estas:
+// ─── IMPRESSÃO ───────────────────────────────────────────────
 
-function _abrirJanela(html, titulo) {
-  // Injeta barra de ação (fechar + imprimir) no topo do HTML
+function _abrirJanela(htmlConteudo) {
+  // Abre a janela IMEDIATAMENTE (sem async/await) para iOS não bloquear
+  var w = window.open('', '_blank');
+  if (!w) { toast('Permita pop-ups para este site nas configurações do Safari.', 'err'); return; }
+
   var barra =
     '<div id="__barra" style="position:fixed;top:0;left:0;right:0;z-index:99999;background:#111;border-bottom:2px solid #cc2222;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;gap:10px;font-family:Arial,sans-serif">' +
-      '<button onclick="window.close()" style="background:#2a2a2a;color:#f0f0f0;border:1px solid #3a3a3a;border-radius:6px;padding:8px 16px;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:6px">← Voltar</button>' +
+      '<button onclick="window.close()" style="background:#2a2a2a;color:#f0f0f0;border:1px solid #3a3a3a;border-radius:6px;padding:8px 16px;font-size:14px;cursor:pointer">← Voltar</button>' +
       '<span style="color:#cc2222;font-family:Arial Black,Arial;font-weight:900;font-size:14px;letter-spacing:1px">MRA</span>' +
-      '<button onclick="window.print()" style="background:#cc2222;color:#fff;border:none;border-radius:6px;padding:8px 16px;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:6px">⎙ Imprimir</button>' +
+      '<button onclick="window.print()" style="background:#cc2222;color:#fff;border:none;border-radius:6px;padding:8px 16px;font-size:14px;cursor:pointer">⎙ Imprimir</button>' +
     '</div>' +
-    '<div style="height:56px"></div>'; // espaço para a barra não cobrir conteúdo
+    '<div style="height:56px"></div>';
 
-  // Insere a barra logo após <body>
-  var htmlFinal = html.replace('<body>', '<body>' + barra);
+  var html = htmlConteudo
+    .replace('<body>', '<body>' + barra)
+    .replace('</style>', '#__barra{display:flex!important}@media print{#__barra{display:none!important}}</style>');
 
-  // Adiciona CSS para esconder a barra na impressão
-  htmlFinal = htmlFinal.replace('</style>', '#__barra{display:flex!important}@media print{#__barra{display:none!important}}</style>');
-
-  var w = window.open('', '_blank');
-  if (!w) {
-    toast('Bloqueio de pop-up detectado. Permita pop-ups para este site.', 'err');
-    return;
-  }
-  w.document.write(htmlFinal);
+  w.document.write(html);
   w.document.close();
   w.focus();
 }
 
 function imprimirFolha() {
-  if (!_dadosFolha || !_dadosFolha.data.length) {
-    toast('Gere a folha primeiro.', 'err'); return;
-  }
+  if (!_dadosFolha || !_dadosFolha.data.length) { toast('Gere a folha primeiro.', 'err'); return; }
   var mes = document.getElementById('folha-mes').value;
   var mesNome = '', ano = '';
   if (mes) { var mp = mes.split('-'); ano = mp[0]; mesNome = mn[parseInt(mp[1])]; }
@@ -898,74 +788,53 @@ function imprimirFolha() {
 
   var html = '<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>' +
     'body{font-family:Arial,sans-serif;font-size:11px;color:#000;margin:0;padding:20px}' +
-    '.logo-box-print{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;border:2.5px solid #1a1a1a;border-radius:3px;padding:4px 14px;background:#fff;line-height:1;gap:1px;margin-bottom:8px}' +
+    '.logo-box-print{display:inline-flex;flex-direction:column;align-items:center;border:2.5px solid #1a1a1a;border-radius:3px;padding:4px 14px;background:#fff;line-height:1;gap:1px;margin-bottom:8px}' +
     '.logo-sigla-print{font-family:Arial Black,Arial,sans-serif;font-size:28px;font-weight:900;color:#cc2222;letter-spacing:3px;line-height:1}' +
     '.logo-sub-print{font-size:8px;font-weight:700;color:#cc2222;letter-spacing:2.5px;text-transform:uppercase;white-space:nowrap}' +
-    'h1{font-size:16px;text-align:center;margin:0 0 4px}' +
-    'h2{font-size:12px;text-align:center;color:#555;margin:0 0 16px;font-weight:normal}' +
+    'h1{font-size:16px;text-align:center;margin:0 0 4px}h2{font-size:12px;text-align:center;color:#555;margin:0 0 16px;font-weight:normal}' +
     '.logo{text-align:center;font-size:20px;font-weight:700;letter-spacing:2px;color:#cc2222;margin-bottom:4px}' +
     'table{width:100%;border-collapse:collapse;margin-top:8px}' +
     'th{background:#cc2222;color:#fff;padding:6px 8px;text-align:left;font-size:10px;text-transform:uppercase}' +
     'td{padding:5px 8px;border-bottom:1px solid #eee;font-size:11px;vertical-align:top}' +
-    'tr:nth-child(even) td{background:#fafafa}' +
-    '.num{text-align:right}' +
-    '.neg{color:#cc2222;text-align:right}' +
+    'tr:nth-child(even) td{background:#fafafa}.num{text-align:right}.neg{color:#cc2222;text-align:right}' +
     '.total-row td{font-weight:700;border-top:2px solid #cc2222;background:#fff0f0}' +
     '.rodape{margin-top:20px;text-align:center;font-size:10px;color:#999;border-top:1px solid #eee;padding-top:10px}' +
     '</style></head><body>';
 
   html += '<div class="logo"><div class="logo-box-print"><span class="logo-sigla-print">MRA</span><span class="logo-sub-print">MOCHILAS E BOLSAS</span></div></div>';
   html += '<h1>Resumo da Folha de Pagamento</h1>';
-  html += '<h2>' + mesNome + (ano ? ' de ' + ano : '') + ' — ' + dias + ' dias no mês — Gerado em: ' + new Date().toLocaleDateString('pt-BR') + '</h2>';
-
-  html += '<table><thead><tr>' +
-    '<th>Funcionário</th><th>Cargo</th>' +
-    '<th class="num">Salário</th>' +
-    '<th class="num">Grat. Fixa</th>' +
-    '<th class="num">Grat. Extra</th>' +
-    '<th class="num">Desconto Falta</th>' +
-    '<th class="num">Vale</th>' +
-    '<th class="num">Total Líquido</th>' +
-    '</tr></thead><tbody>';
+  html += '<h2>'+mesNome+(ano?' de '+ano:'')+' — '+dias+' dias no mês — Gerado em: '+new Date().toLocaleDateString('pt-BR')+'</h2>';
+  html += '<table><thead><tr><th>Funcionário</th><th>Cargo</th><th class="num">Salário</th><th class="num">Grat. Fixa</th><th class="num">Grat. Extra</th><th class="num">Desconto Falta</th><th class="num">Vale</th><th class="num">Total Líquido</th></tr></thead><tbody>';
 
   var totalGeral = 0;
   _dadosFolha.data.forEach(function(r) {
     var f = r.funcionario;
     var salProp = r.salarioProporcional !== undefined ? parseFloat(r.salarioProporcional) : parseFloat(f.salario);
     totalGeral += parseFloat(r.totalLiquido);
-
     var obs = '';
     if (r.temRescisao) obs = ' ⚠ Rescisão '+fmtData(r.dataRescisao)+' ('+r.diasTrabalhados+'/'+r.diasMes+' dias)';
-    else if (r.faltasSimples.length > 0 && r.faltasJust.length > 0)
-      obs = ' ✕ '+r.faltasSimples.length+' não justificada(s) | ✦ '+r.faltasJust.length+' justificada(s)';
-    else if (r.faltasSimples.length > 0)
-      obs = ' ✕ '+r.faltasSimples.length+' falta(s) não justificada(s)';
-    else if (r.faltasJust.length > 0)
-      obs = ' ✦ '+r.faltasJust.length+' falta(s) justificada(s)';
-
+    else if (r.faltasSimples.length>0&&r.faltasJust.length>0) obs = ' ✕ '+r.faltasSimples.length+' não justificada(s) | ✦ '+r.faltasJust.length+' justificada(s)';
+    else if (r.faltasSimples.length>0) obs = ' ✕ '+r.faltasSimples.length+' falta(s) não justificada(s)';
+    else if (r.faltasJust.length>0) obs = ' ✦ '+r.faltasJust.length+' falta(s) justificada(s)';
     var gratsExtrasTotal = r.gratsExtras ? r.gratsExtras.reduce(function(s,g){return s+parseFloat(g.valor);},0) : 0;
-
-    html += '<tr>' +
-      '<td><strong>'+f.nome+'</strong>'+(obs?'<br><span style="font-size:10px;color:#888">'+obs+'</span>':'')+'</td>' +
-      '<td>'+f.cargo+'</td>' +
-      '<td class="num">'+fmt(salProp)+'</td>' +
-      '<td class="num">'+(r.gratFixa>0?'<span style="color:green">'+fmt(r.gratFixa)+'</span>':'<span style="color:#aaa">—</span>')+'</td>' +
-      '<td class="num">'+(gratsExtrasTotal>0?'<span style="color:green">'+fmt(gratsExtrasTotal)+'</span>':'<span style="color:#aaa">—</span>')+'</td>' +
-      '<td class="neg" style="font-size:10px">'+(r.desconto>0?'- '+fmt(r.desconto)+(r.faltasJust.length>0?'<br><span style="color:#b8860b;font-size:9px">✦ '+r.faltasJust.length+' justif. s/ desconto</span>':''):'<span style="color:#aaa">—</span>')+'</td>' +
-      '<td class="neg">'+(r.valorVale>0?'- '+fmt(r.valorVale):'<span style="color:#aaa">—</span>')+'</td>' +
-      '<td class="num"><strong>'+fmt(parseFloat(r.totalLiquido))+'</strong></td>' +
+    html += '<tr>'+
+      '<td><strong>'+f.nome+'</strong>'+(obs?'<br><span style="font-size:10px;color:#888">'+obs+'</span>':'')+'</td>'+
+      '<td>'+f.cargo+'</td>'+
+      '<td class="num">'+fmt(salProp)+'</td>'+
+      '<td class="num">'+(r.gratFixa>0?'<span style="color:green">'+fmt(r.gratFixa)+'</span>':'<span style="color:#aaa">—</span>')+'</td>'+
+      '<td class="num">'+(gratsExtrasTotal>0?'<span style="color:green">'+fmt(gratsExtrasTotal)+'</span>':'<span style="color:#aaa">—</span>')+'</td>'+
+      '<td class="neg" style="font-size:10px">'+(r.desconto>0?'- '+fmt(r.desconto)+(r.faltasJust.length>0?'<br><span style="color:#b8860b;font-size:9px">✦ '+r.faltasJust.length+' justif. s/ desconto</span>':''):'<span style="color:#aaa">—</span>')+'</td>'+
+      '<td class="neg">'+(r.valorVale>0?'- '+fmt(r.valorVale):'<span style="color:#aaa">—</span>')+'</td>'+
+      '<td class="num"><strong>'+fmt(parseFloat(r.totalLiquido))+'</strong></td>'+
     '</tr>';
   });
-
   html += '<tr class="total-row"><td colspan="7">TOTAL GERAL DA FOLHA</td><td class="num">'+fmt(totalGeral)+'</td></tr>';
-  html += '</tbody></table>';
-  html += '<div class="rodape">MRA Mochilas e Bolsas — ' + new Date().toLocaleString('pt-BR') + '</div>';
-  html += '</body></html>';
+  html += '</tbody></table><div class="rodape">MRA Mochilas e Bolsas — '+new Date().toLocaleString('pt-BR')+'</div></body></html>';
 
   _abrirJanela(html);
 }
 
-function imprimirFuncionario(funcId, btn) {
+function imprimirFuncionario(funcId) {
   if (!_dadosFolha) { toast('Gere a folha primeiro.', 'err'); return; }
   var r = _dadosFolha.data.find(function(r){ return r.funcionario.id === funcId; });
   if (!r) { toast('Funcionário não encontrado na folha.', 'err'); return; }
@@ -986,75 +855,18 @@ function imprimirFuncionario(funcId, btn) {
     var cancelada = r.temFalta||r.temRescisao;
     linhas += '<tr><td>'+g.nome+'</td><td class="right '+(cancelada?'neg':'pos')+'">'+(cancelada?'cancelada':fmt(parseFloat(g.valor)))+'</td></tr>';
   });
-  if (r.faltasSimples.length>0) {
-    linhas += '<tr><td>Desconto por '+r.faltasSimples.length+' falta(s) simples</td><td class="right neg">- '+fmt(parseFloat(r.desconto))+'</td></tr>';
-  }
-  if (r.faltasJust.length>0) {
-    linhas += '<tr><td>Falta(s) justificada(s) — '+r.faltasJust.length+' dia(s)</td><td class="right" style="color:#b8860b">sem desconto</td></tr>';
-  }
+  if (r.faltasSimples.length>0) linhas += '<tr><td>Desconto por '+r.faltasSimples.length+' falta(s) simples</td><td class="right neg">- '+fmt(parseFloat(r.desconto))+'</td></tr>';
+  if (r.faltasJust.length>0) linhas += '<tr><td>Falta(s) justificada(s) — '+r.faltasJust.length+' dia(s)</td><td class="right" style="color:#b8860b">sem desconto</td></tr>';
   if (r.valorVale>0) {
     var valeObs = r.vale&&r.vale.data_vale ? ' — '+fmtData(r.vale.data_vale) : '';
     valeObs += r.vale&&r.vale.observacao ? ' ('+r.vale.observacao+')' : '';
     linhas += '<tr><td>Vale'+valeObs+'</td><td class="right neg">- '+fmt(parseFloat(r.valorVale))+'</td></tr>';
   }
 
-  function blocoRecibo(titulo) {
-    var cpf = f.cpf || '—';
-    var admissao = f.admissao ? fmtData(f.admissao) : '—';
-    var depto = f.departamento || '—';
-    var geradoEm = new Date().toLocaleDateString('pt-BR');
-    return (
-      '<div class="recibo">' +
-        '<div class="rec-header">' +
-          '<div class="rec-mra-box"><span class="rec-mra-sigla">MRA</span><span class="rec-mra-sub">MOCHILAS E BOLSAS</span></div>' +
-          '<div class="rec-titulo">' + titulo + '</div>' +
-        '</div>' +
-        '<div class="rec-section">' +
-          '<div class="rec-section-title">DADOS DO FUNCIONÁRIO</div>' +
-          '<div class="rec-grid">' +
-            '<div class="rec-field"><span class="rec-label">Nome</span><span class="rec-value bold">'+f.nome+'</span></div>' +
-            '<div class="rec-field"><span class="rec-label">CPF</span><span class="rec-value">'+cpf+'</span></div>' +
-            '<div class="rec-field"><span class="rec-label">Cargo</span><span class="rec-value">'+f.cargo+'</span></div>' +
-            '<div class="rec-field"><span class="rec-label">Departamento</span><span class="rec-value">'+depto+'</span></div>' +
-            '<div class="rec-field"><span class="rec-label">Admissão</span><span class="rec-value">'+admissao+'</span></div>' +
-            '<div class="rec-field"><span class="rec-label">Competência</span><span class="rec-value bold red">'+mesNome+(ano?' de '+ano:'')+'</span></div>' +
-          '</div>' +
-          (r.temRescisao ? '<div class="rec-rescisao">⚠ Rescisão em '+fmtData(r.dataRescisao)+' — '+r.diasTrabalhados+' de '+r.diasMes+' dias</div>' : '') +
-        '</div>' +
-        '<div class="rec-section">' +
-          '<div class="rec-section-title">DETALHAMENTO DE PAGAMENTO</div>' +
-          '<table class="rec-table">' +
-            '<thead><tr><th>Descrição</th><th class="right">Valor</th></tr></thead>' +
-            '<tbody>' + linhas + '</tbody>' +
-            '<tfoot><tr class="rec-total"><td>TOTAL LÍQUIDO A RECEBER</td><td class="right red bold">'+fmt(parseFloat(r.totalLiquido))+'</td></tr></tfoot>' +
-          '</table>' +
-        '</div>' +
-        (r.faltasMes && r.faltasMes.length ? (
-          '<div class="rec-section">' +
-            '<div class="rec-section-title">OCORRÊNCIAS DO MÊS</div>' +
-            r.faltasMes.map(function(fa){
-              return '<div class="rec-ocorrencia"><span style="font-weight:600">'+fmtData(fa.data)+'</span> <span class="rec-tipo-'+(fa.tipo==='simples'?'falta':'just')+'">'+(tl[fa.tipo]||fa.tipo)+'</span> — '+fa.justificativa+'</div>';
-            }).join('') +
-          '</div>'
-        ) : '') +
-        '<div class="rec-assinatura">' +
-          '<div class="rec-ass-texto">Declaro que recebi os valores acima discriminados, referentes à competência <strong>'+mesNome+(ano?' de '+ano:'')+'</strong>, estando de acordo com o presente recibo.</div>' +
-          '<div class="rec-ass-grid">' +
-            '<div class="rec-ass-item"><div class="rec-ass-linha"></div><div class="rec-ass-label">'+f.nome+'</div><div class="rec-ass-sub">Assinatura do Funcionário</div></div>' +
-            '<div class="rec-ass-item"><div class="rec-ass-linha"></div><div class="rec-ass-label">Responsável pela Empresa</div><div class="rec-ass-sub">Assinatura e Carimbo</div></div>' +
-            '<div class="rec-ass-item"><div class="rec-ass-linha"></div><div class="rec-ass-label">Data de recebimento</div><div class="rec-ass-sub">____/____/________</div></div>' +
-          '</div>' +
-          '<div class="rec-rodape">Gerado em '+geradoEm+' — MRA Mochilas e Bolsas | Documento sem valor fiscal</div>' +
-        '</div>' +
-      '</div>'
-    );
-  }
-
-  var html = '<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Recibo — '+f.nome+'</title><style>' +
+  var css =
     '*{box-sizing:border-box;margin:0;padding:0}' +
     'body{font-family:Arial,sans-serif;font-size:9px;color:#1a1a1a;background:#fff}' +
-    '@page{size:A4;margin:0}' +
-    '@media print{body{margin:0}}' +
+    '@page{size:A4;margin:0}@media print{body{margin:0}}' +
     '.pagina{width:100%;padding:0;display:flex;flex-direction:column}' +
     '.recibo{flex:1;padding:8mm 12mm;display:flex;flex-direction:column}' +
     '.corte{display:flex;align-items:center;gap:6px;padding:0 12mm;flex-shrink:0}' +
@@ -1070,14 +882,12 @@ function imprimirFuncionario(funcId, btn) {
     '.rec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}' +
     '.rec-field{display:flex;flex-direction:column;gap:0}' +
     '.rec-label{font-size:7px;text-transform:uppercase;letter-spacing:.3px;color:#999}' +
-    '.rec-value{font-size:9px;color:#1a1a1a}' +
-    '.bold{font-weight:700}.red{color:#cc2222}' +
+    '.rec-value{font-size:9px;color:#1a1a1a}.bold{font-weight:700}.red{color:#cc2222}' +
     '.rec-rescisao{background:#fff0f0;border:1px solid #ffcccc;border-radius:3px;padding:2px 5px;font-size:8px;color:#cc2222;font-weight:600;margin-top:3px}' +
     '.rec-table{width:100%;border-collapse:collapse;margin-bottom:4px}' +
     '.rec-table thead th{background:#cc2222;color:#fff;padding:2px 5px;font-size:7.5px;text-transform:uppercase}' +
     '.rec-table tbody td{padding:2px 5px;border-bottom:1px solid #f0f0f0;font-size:8.5px}' +
-    '.rec-table tbody tr:nth-child(even) td{background:#fafafa}' +
-    '.right{text-align:right}' +
+    '.rec-table tbody tr:nth-child(even) td{background:#fafafa}.right{text-align:right}' +
     '.pos{color:#2e7d32;text-align:right}.neg{color:#cc2222;text-align:right}.cut{text-decoration:line-through;color:#aaa;text-align:right}' +
     '.rec-total td{font-weight:700;padding:3px 5px;border-top:1.5px solid #cc2222;background:#fff5f5;font-size:9px}' +
     '.rec-ocorrencia{font-size:8px;padding:2px 0;border-bottom:1px dashed #eee;color:#555}' +
@@ -1085,13 +895,53 @@ function imprimirFuncionario(funcId, btn) {
     '.rec-assinatura{margin-top:4px;padding-top:3px}' +
     '.rec-ass-texto{font-size:7.5px;color:#555;margin-bottom:5px;line-height:1.3;text-align:justify}' +
     '.rec-ass-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:3px}' +
-    '.rec-ass-item{text-align:center}' +
-    '.rec-ass-linha{border-bottom:1px solid #333;height:14px;margin-bottom:2px}' +
-    '.rec-ass-label{font-size:7.5px;font-weight:600;color:#333}' +
-    '.rec-ass-sub{font-size:7px;color:#888}' +
-    '.rec-rodape{text-align:center;font-size:7px;color:#bbb;margin-top:3px}' +
-    '</style></head><body><div class="pagina">';
+    '.rec-ass-item{text-align:center}.rec-ass-linha{border-bottom:1px solid #333;height:14px;margin-bottom:2px}' +
+    '.rec-ass-label{font-size:7.5px;font-weight:600;color:#333}.rec-ass-sub{font-size:7px;color:#888}' +
+    '.rec-rodape{text-align:center;font-size:7px;color:#bbb;margin-top:3px}';
 
+  function blocoRecibo(titulo) {
+    var cpf = f.cpf||'—', admissao = f.admissao?fmtData(f.admissao):'—', depto = f.departamento||'—';
+    var geradoEm = new Date().toLocaleDateString('pt-BR');
+    return '<div class="recibo">' +
+      '<div class="rec-header">' +
+        '<div class="rec-mra-box"><span class="rec-mra-sigla">MRA</span><span class="rec-mra-sub">MOCHILAS E BOLSAS</span></div>' +
+        '<div class="rec-titulo">'+titulo+'</div>' +
+      '</div>' +
+      '<div class="rec-section"><div class="rec-section-title">DADOS DO FUNCIONÁRIO</div>' +
+        '<div class="rec-grid">' +
+          '<div class="rec-field"><span class="rec-label">Nome</span><span class="rec-value bold">'+f.nome+'</span></div>' +
+          '<div class="rec-field"><span class="rec-label">CPF</span><span class="rec-value">'+cpf+'</span></div>' +
+          '<div class="rec-field"><span class="rec-label">Cargo</span><span class="rec-value">'+f.cargo+'</span></div>' +
+          '<div class="rec-field"><span class="rec-label">Departamento</span><span class="rec-value">'+depto+'</span></div>' +
+          '<div class="rec-field"><span class="rec-label">Admissão</span><span class="rec-value">'+admissao+'</span></div>' +
+          '<div class="rec-field"><span class="rec-label">Competência</span><span class="rec-value bold red">'+mesNome+(ano?' de '+ano:'')+'</span></div>' +
+        '</div>' +
+        (r.temRescisao?'<div class="rec-rescisao">⚠ Rescisão em '+fmtData(r.dataRescisao)+' — '+r.diasTrabalhados+' de '+r.diasMes+' dias</div>':'') +
+      '</div>' +
+      '<div class="rec-section"><div class="rec-section-title">DETALHAMENTO DE PAGAMENTO</div>' +
+        '<table class="rec-table"><thead><tr><th>Descrição</th><th class="right">Valor</th></tr></thead>' +
+        '<tbody>'+linhas+'</tbody>' +
+        '<tfoot><tr class="rec-total"><td>TOTAL LÍQUIDO A RECEBER</td><td class="right red bold">'+fmt(parseFloat(r.totalLiquido))+'</td></tr></tfoot>' +
+        '</table>' +
+      '</div>' +
+      (r.faltasMes&&r.faltasMes.length ?
+        '<div class="rec-section"><div class="rec-section-title">OCORRÊNCIAS DO MÊS</div>' +
+        r.faltasMes.map(function(fa){
+          return '<div class="rec-ocorrencia"><span style="font-weight:600">'+fmtData(fa.data)+'</span> <span class="rec-tipo-'+(fa.tipo==='simples'?'falta':'just')+'">'+(tl[fa.tipo]||fa.tipo)+'</span> — '+fa.justificativa+'</div>';
+        }).join('')+'</div>' : '') +
+      '<div class="rec-assinatura">' +
+        '<div class="rec-ass-texto">Declaro que recebi os valores acima discriminados, referentes à competência <strong>'+mesNome+(ano?' de '+ano:'')+'</strong>, estando de acordo com o presente recibo.</div>' +
+        '<div class="rec-ass-grid">' +
+          '<div class="rec-ass-item"><div class="rec-ass-linha"></div><div class="rec-ass-label">'+f.nome+'</div><div class="rec-ass-sub">Assinatura do Funcionário</div></div>' +
+          '<div class="rec-ass-item"><div class="rec-ass-linha"></div><div class="rec-ass-label">Responsável pela Empresa</div><div class="rec-ass-sub">Assinatura e Carimbo</div></div>' +
+          '<div class="rec-ass-item"><div class="rec-ass-linha"></div><div class="rec-ass-label">Data de recebimento</div><div class="rec-ass-sub">____/____/________</div></div>' +
+        '</div>' +
+        '<div class="rec-rodape">Gerado em '+geradoEm+' — MRA Mochilas e Bolsas | Documento sem valor fiscal</div>' +
+      '</div>' +
+    '</div>';
+  }
+
+  var html = '<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Recibo — '+f.nome+'</title><style>'+css+'</style></head><body><div class="pagina">';
   html += blocoRecibo('RECIBO DE PAGAMENTO — VIA DA EMPRESA');
   html += '<div class="corte"><div class="corte-linha"></div><span class="corte-texto">✂ RECORTE AQUI ✂</span><div class="corte-linha"></div></div>';
   html += blocoRecibo('RECIBO DE PAGAMENTO — VIA DO FUNCIONÁRIO');
@@ -1099,6 +949,7 @@ function imprimirFuncionario(funcId, btn) {
 
   _abrirJanela(html);
 }
+
 // ─── INIT ────────────────────────────────────────────────────
 
 (function(){
