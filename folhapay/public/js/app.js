@@ -768,11 +768,11 @@ function _abrirJanela(htmlConteudo) {
       '<span style="color:#cc2222;font-family:Arial Black,Arial;font-weight:900;font-size:14px;letter-spacing:1px">MRA</span>' +
       '<button onclick="window.print()" style="background:#cc2222;color:#fff;border:none;border-radius:6px;padding:8px 16px;font-size:14px;cursor:pointer">⎙ Imprimir</button>' +
     '</div>' +
-    '<div style="height:56px"></div>';
+    '<div id="__espacador" style="height:56px"></div>';
 
   var html = htmlConteudo
     .replace('<body>', '<body>' + barra)
-    .replace('</style>', '#__barra{display:flex!important}@media print{#__barra{display:none!important}}</style>');
+    .replace('</style>', '#__barra{display:flex!important}@media print{#__barra{display:none!important}#__espacador{display:none!important}}</style>');
 
   w.document.write(html);
   w.document.close();
