@@ -31,12 +31,13 @@
     <button class="nav-btn" onclick="showPage('faltas', this)">✕ Faltas</button>
     <button class="nav-btn" onclick="showPage('vales', this)">💵 Vales</button>
     <button class="nav-btn" onclick="showPage('folha', this)">▣ Folha de Pagamento</button>
+    <button class="nav-btn" onclick="showPage('vt', this)">🚌 Vale Transporte</button>
   </nav>
 </header>
 
 <!-- ── BOTTOM NAV MOBILE ── -->
 <nav class="bottom-nav">
-  <div class="bottom-nav-inner">
+  <div class="bottom-nav-inner" style="grid-template-columns:repeat(6,1fr)!important">
     <button class="bottom-btn active" id="bnav-cadastro" onclick="showPageMobile('cadastro')">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="16" y1="11" x2="22" y2="11"/></svg>
       <span>Cadastrar</span>
@@ -44,7 +45,7 @@
     <button class="bottom-btn" id="bnav-funcionarios" onclick="showPageMobile('funcionarios')">
       <span class="dot" id="dot-funcs"></span>
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="3"/><path d="M21 20c0-2.8-1.8-5-4-5.5"/></svg>
-      <span>Funcionários</span>
+      <span>Funcs</span>
     </button>
     <button class="bottom-btn" id="bnav-faltas" onclick="showPageMobile('faltas')">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
@@ -58,6 +59,10 @@
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>
       <span>Folha</span>
     </button>
+    <button class="bottom-btn" id="bnav-vt" onclick="showPageMobile('vt')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+      <span>VT</span>
+    </button>
   </div>
 </nav>
 
@@ -66,7 +71,6 @@
   <!-- ════════════ CADASTRO ════════════ -->
   <div id="page-cadastro" class="page active">
     <div class="page-title">Cadastrar <span>Funcionário</span></div>
-
     <div class="card animate-in">
       <div class="card-title">Dados pessoais</div>
       <div class="form-grid">
@@ -100,7 +104,6 @@
         </div>
       </div>
     </div>
-
     <div class="card animate-in" style="animation-delay:.07s">
       <div class="card-title">Gratificações extras</div>
       <div class="grat-fixa-toggle" style="display:flex;align-items:center;justify-content:space-between;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:14px 16px;margin-bottom:14px;gap:12px;flex-wrap:wrap">
@@ -108,23 +111,15 @@
           <div style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:3px">Gratificação fixa de <span style="color:var(--red-l)">R$ 300,00</span></div>
           <div style="font-size:12px;color:var(--muted)">Ative se este funcionário tem direito à gratificação fixa mensal</div>
         </div>
-        <label class="toggle-switch">
-          <input type="checkbox" id="c-grat-fixa">
-          <span class="toggle-slider"></span>
-        </label>
+        <label class="toggle-switch"><input type="checkbox" id="c-grat-fixa"><span class="toggle-slider"></span></label>
       </div>
-      <!-- Toggle gratificação auxiliar R$200 -->
       <div class="grat-fixa-toggle" style="display:flex;align-items:center;justify-content:space-between;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:14px 16px;margin-bottom:12px;gap:12px;flex-wrap:wrap">
         <div>
           <div style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:3px">Gratificação auxiliar de <span style="color:var(--red-l)">R$ 200,00</span></div>
           <div style="font-size:12px;color:var(--muted)">Ative se este funcionário tem direito à gratificação dos auxiliares</div>
         </div>
-        <label class="toggle-switch">
-          <input type="checkbox" id="c-grat-aux">
-          <span class="toggle-slider"></span>
-        </label>
+        <label class="toggle-switch"><input type="checkbox" id="c-grat-aux"><span class="toggle-slider"></span></label>
       </div>
-
       <p style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.6">
         Adicione outras gratificações personalizadas abaixo.<br>
         <em style="font-size:12px;color:var(--dim)">Obs: todas são canceladas se o funcionário tiver qualquer falta no mês.</em>
@@ -136,7 +131,6 @@
       </div>
       <div id="grat-lista" class="row" style="min-height:34px"></div>
     </div>
-
     <div class="row r-end animate-in" style="animation-delay:.13s">
       <button class="btn btn-ghost" onclick="limparForm()">Limpar</button>
       <button class="btn btn-primary" id="btn-cadastrar" onclick="cadastrar()">
@@ -160,7 +154,6 @@
   <!-- ════════════ FALTAS ════════════ -->
   <div id="page-faltas" class="page">
     <div class="page-title">Registrar <span>Falta</span></div>
-
     <div class="card animate-in">
       <div class="card-title">Nova falta</div>
       <div class="form-grid">
@@ -175,21 +168,11 @@
         <div class="form-group full">
           <label>Tipo de falta *</label>
           <div class="tipo-group">
-            <button class="tipo-btn sel" id="tipo-simples" onclick="setTipo('simples')">
-              ✕ Falta simples
-              <span class="sub">Desconta salário + perde gratificação</span>
-            </button>
-            <button class="tipo-btn" id="tipo-atestado" onclick="setTipo('atestado')">
-              ✦ Atestado médico / Dentista
-              <span class="sub">Sem desconto — perde gratificação</span>
-            </button>
-            <button class="tipo-btn" id="tipo-outro" onclick="setTipo('outro')">
-              ◈ Outro motivo justificado
-              <span class="sub">Sem desconto — perde gratificação</span>
-            </button>
+            <button class="tipo-btn sel" id="tipo-simples" onclick="setTipo('simples')">✕ Falta simples<span class="sub">Desconta salário + perde gratificação</span></button>
+            <button class="tipo-btn" id="tipo-atestado" onclick="setTipo('atestado')">✦ Atestado médico / Dentista<span class="sub">Sem desconto — perde gratificação</span></button>
+            <button class="tipo-btn" id="tipo-outro" onclick="setTipo('outro')">◈ Outro motivo justificado<span class="sub">Sem desconto — perde gratificação</span></button>
           </div>
         </div>
-        <!-- Campo de foto do atestado (aparece só quando atestado é selecionado) -->
         <div class="form-group full" id="campo-foto-atestado" style="display:none">
           <label style="color:var(--warn)">📎 Foto do atestado médico</label>
           <div id="upload-area" onclick="document.getElementById('f-foto').click()"
@@ -209,7 +192,6 @@
           </div>
           <input type="file" id="f-foto" accept="image/*,application/pdf" style="display:none" onchange="previewFoto(this)">
         </div>
-
         <div class="form-group full">
           <label>Justificativa *</label>
           <textarea id="f-just" placeholder="Descreva o motivo da falta com detalhes..."></textarea>
@@ -217,28 +199,20 @@
       </div>
       <div class="row r-end" style="margin-top:14px">
         <button class="btn btn-primary" id="btn-falta" onclick="registrarFalta()">
-          <span class="btn-text">✓ Registrar falta</span>
-          <span class="spinner"></span>
+          <span class="btn-text">✓ Registrar falta</span><span class="spinner"></span>
         </button>
       </div>
     </div>
-
     <div class="search-row" style="margin-top:1.5rem">
       <div class="section-title">Faltas Registradas</div>
-      <select id="filtro-faltas" onchange="carregarFaltas()">
-        <option value="">Todos os funcionários</option>
-      </select>
+      <select id="filtro-faltas" onchange="carregarFaltas()"><option value="">Todos os funcionários</option></select>
     </div>
-    <div id="lista-faltas">
-      <div class="empty"><div class="empty-icon">◈</div>Carregando...</div>
-    </div>
+    <div id="lista-faltas"><div class="empty"><div class="empty-icon">◈</div>Carregando...</div></div>
   </div>
-
 
   <!-- ════════════ VALES ════════════ -->
   <div id="page-vales" class="page">
     <div class="page-title">Registrar <span>Vale</span></div>
-
     <div class="card animate-in">
       <div class="card-title">Novo vale</div>
       <div class="form-grid">
@@ -258,9 +232,7 @@
           <input type="text" id="v-obs" placeholder="Ex: Adiantamento de salário">
         </div>
       </div>
-
       <div style="margin-top:1rem">
-        <!-- Barra aplicar valor único - ACIMA da lista -->
         <div style="display:flex;align-items:center;gap:10px;background:var(--red-dim2);border:1px solid rgba(204,34,34,0.25);border-radius:6px;padding:12px 14px;margin-bottom:10px;flex-wrap:wrap">
           <span style="font-size:13px;color:var(--gray-l);flex:1;min-width:140px">💵 Mesmo valor para todos selecionados:</span>
           <div class="row" style="gap:8px">
@@ -268,8 +240,6 @@
             <button class="btn btn-sm btn-primary" onclick="aplicarValorUnico()">✓ Aplicar</button>
           </div>
         </div>
-
-        <!-- Cabeçalho com busca e botões -->
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px">
           <label style="font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--muted)">Selecione os funcionários</label>
           <div class="row" style="gap:8px">
@@ -278,32 +248,24 @@
             <button class="btn btn-sm btn-ghost" onclick="deselecionarTodosVale()">Limpar</button>
           </div>
         </div>
-
-        <!-- Lista de funcionários -->
         <div id="v-func-lista" style="display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto;padding-right:4px"></div>
       </div>
-
       <div class="row r-end" style="margin-top:14px">
         <button class="btn btn-primary" id="btn-vale" onclick="registrarVales()">
-          <span class="btn-text">✓ Registrar vales</span>
-          <span class="spinner"></span>
+          <span class="btn-text">✓ Registrar vales</span><span class="spinner"></span>
         </button>
       </div>
     </div>
-
     <div class="search-row" style="margin-top:1.5rem">
       <div class="section-title">Vales Registrados</div>
       <input type="month" id="filtro-mes-vale" onchange="carregarVales()">
     </div>
-    <div id="lista-vales">
-      <div class="empty"><div class="empty-icon">◈</div>Carregando...</div>
-    </div>
+    <div id="lista-vales"><div class="empty"><div class="empty-icon">◈</div>Carregando...</div></div>
   </div>
 
   <!-- ════════════ FOLHA ════════════ -->
   <div id="page-folha" class="page">
     <div class="page-title">Folha de <span>Pagamento</span></div>
-
     <div class="card animate-in no-print">
       <div class="card-title">Configuração da folha</div>
       <div class="form-grid">
@@ -314,9 +276,7 @@
         </div>
         <div class="form-group">
           <label>Funcionário</label>
-          <select id="folha-func">
-            <option value="">Todos os funcionários</option>
-          </select>
+          <select id="folha-func"><option value="">Todos os funcionários</option></select>
         </div>
         <div class="form-group">
           <label>Buscar por nome</label>
@@ -325,21 +285,50 @@
       </div>
       <div class="row r-end" style="margin-top:14px;gap:8px">
         <button class="btn btn-primary" id="btn-folha" onclick="gerarFolha()">
-          <span class="btn-text">◉ Gerar folha</span>
-          <span class="spinner"></span>
+          <span class="btn-text">◉ Gerar folha</span><span class="spinner"></span>
         </button>
         <button class="btn" onclick="imprimirFolha()">⎙ Imprimir</button>
       </div>
     </div>
+    <div id="area-impressao">
+      <div class="print-header" style="display:none;text-align:center;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid #cc2222">
+        <div style="font-size:24px;font-weight:700;letter-spacing:2px;color:#cc2222">FOLHAPAY</div>
+        <div style="font-size:13px;color:#555;margin-top:4px" id="print-subtitulo"></div>
+      </div>
+      <div id="folha-resultado"></div>
+    </div>
+  </div>
 
-    <div id="area-impressao"><div class="print-header" style="display:none;text-align:center;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid #cc2222"><div style="font-size:24px;font-weight:700;letter-spacing:2px;color:#cc2222">FOLHAPAY</div><div style="font-size:13px;color:#555;margin-top:4px" id="print-subtitulo"></div></div><div id="folha-resultado"></div></div>
+  <!-- ════════════ VALE TRANSPORTE ════════════ -->
+  <div id="page-vt" class="page">
+    <div class="page-title">Vale <span>Transporte</span></div>
+
+    <div class="card animate-in">
+      <div class="card-title">Configuração</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Mês de referência</label>
+          <input type="month" id="vt-mes" onchange="calcularVT()">
+        </div>
+        <div class="form-group">
+          <label>Valor da passagem (R$)</label>
+          <input type="number" id="vt-passagem" value="4.30" step="0.01" min="0" inputmode="decimal" oninput="calcularVT()">
+        </div>
+        <div class="form-group">
+          <label>Passagens por dia</label>
+          <input type="number" id="vt-passagens-dia" value="2" min="1" max="10" inputmode="numeric" oninput="calcularVT()">
+        </div>
+      </div>
+    </div>
+
+    <div id="vt-resultado" class="animate-in" style="animation-delay:.07s"></div>
+
   </div>
 
 </div>
 
-<script src="/js/app.js?v=2"></script>
+<script src="/js/app.js?v=3"></script>
 <script>
-  // Navegação mobile (bottom nav)
   function showPageMobile(name) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.bottom-btn').forEach(b => b.classList.remove('active'));
@@ -348,6 +337,7 @@
     if (name === 'funcionarios') carregarFuncionarios();
     if (name === 'faltas') { carregarSelectFuncs(); carregarFaltas(); }
     if (name === 'folha') carregarSelectFuncs();
+    if (name === 'vt') calcularVT();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 </script>

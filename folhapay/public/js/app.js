@@ -933,7 +933,7 @@ function imprimirFuncionario(funcId) {
     '.rec-ass-label{font-size:10px;font-weight:700;color:#222}' +
     '.rec-ass-sub{font-size:9px;color:#888}' +
     '.rec-rodape{text-align:center;font-size:8px;color:#bbb;margin-top:3px}';
-    
+
   function blocoRecibo(titulo) {
     var cpf = f.cpf||'—', admissao = f.admissao?fmtData(f.admissao):'—', depto = f.departamento||'—';
     var geradoEm = new Date().toLocaleDateString('pt-BR');
@@ -1002,3 +1002,236 @@ function imprimirFuncionario(funcId) {
   renderGratsTemp();
   atualizarBadgeFuncs();
 })();
+
+// ─── VALE TRANSPORTE ─────────────────────────────────────────
+
+// Feriados nacionais fixos (dia/mes)
+var feriadosNacionais = [
+  {d:1,  m:1,  n:'Confraternização Universal'},
+  {d:21, m:4,  n:'Tiradentes'},
+  {d:1,  m:5,  n:'Dia do Trabalho'},
+  {d:7,  m:9,  n:'Independência do Brasil'},
+  {d:12, m:10, n:'Nossa Sra. Aparecida'},
+  {d:2,  m:11, n:'Finados'},
+  {d:15, m:11, n:'Proclamação da República'},
+  {d:20, m:11, n:'Consciência Negra'},
+  {d:25, m:12, n:'Natal'},
+];
+
+// Feriados de Goiás fixos (dia/mes)
+var feriadosGoias = [
+  {d:26, m:7,  n:'Aniversário de Goiânia'},
+  {d:24, m:10, n:'Pedra Fundamental de Goiás'},
+];
+
+// Páscoa (algoritmo de Gauss)
+function calcularPascoa(ano) {
+  var a = ano % 19;
+  var b = Math.floor(ano / 100);
+  var c = ano % 100;
+  var d = Math.floor(b / 4);
+  var e = b % 4;
+  var f = Math.floor((b + 8) / 25);
+  var g = Math.floor((b - f + 1) / 3);
+  var h = (19 * a + b - d - g + 15) % 30;
+  var i = Math.floor(c / 4);
+  var k = c % 4;
+  var l = (32 + 2 * e + 2 * i - h - k) % 7;
+  var m = Math.floor((a + 11 * h + 22 * l) / 451);
+  var mes = Math.floor((h + l - 7 * m + 114) / 31);
+  var dia = ((h + l - 7 * m + 114) % 31) + 1;
+  return new Date(ano, mes - 1, dia);
+}
+
+function getFeriadosMoveis(ano) {
+  var pascoa = calcularPascoa(ano);
+  var result = [];
+
+  // Carnaval: -47 dias antes da Páscoa
+  var carnaval = new Date(pascoa); carnaval.setDate(carnaval.getDate() - 47);
+  result.push({d: carnaval.getDate(), m: carnaval.getMonth()+1, n: 'Carnaval'});
+
+  // Sexta-feira Santa: -2 dias
+  var sextaSanta = new Date(pascoa); sextaSanta.setDate(sextaSanta.getDate() - 2);
+  result.push({d: sextaSanta.getDate(), m: sextaSanta.getMonth()+1, n: 'Sexta-feira Santa'});
+
+  // Páscoa
+  result.push({d: pascoa.getDate(), m: pascoa.getMonth()+1, n: 'Páscoa'});
+
+  // Corpus Christi: +60 dias
+  var corpus = new Date(pascoa); corpus.setDate(corpus.getDate() + 60);
+  result.push({d: corpus.getDate(), m: corpus.getMonth()+1, n: 'Corpus Christi'});
+
+  return result;
+}
+
+function isFeriado(data, ano) {
+  var d = data.getDate();
+  var m = data.getMonth() + 1;
+  var moveis = getFeriadosMoveis(ano);
+  var todos = feriadosNacionais.concat(feriadosGoias).concat(moveis);
+  return todos.find(function(f){ return f.d === d && f.m === m; });
+}
+
+function calcularVT() {
+  var mesInput = document.getElementById('vt-mes').value;
+  var passagem = parseFloat(document.getElementById('vt-passagem').value) || 4.30;
+  var passagensDia = parseInt(document.getElementById('vt-passagens-dia').value) || 2;
+  var el = document.getElementById('vt-resultado');
+
+  if (!mesInput) { el.innerHTML = ''; return; }
+
+  var partes = mesInput.split('-');
+  var ano = parseInt(partes[0]);
+  var mes = parseInt(partes[1]);
+  var nomeMes = mn[mes] + ' de ' + ano;
+
+  // Calcula todos os dias úteis do mês (seg-sex, sem feriados)
+  var diasUteis = [];
+  var feriadosDoMes = [];
+  var totalDias = new Date(ano, mes, 0).getDate();
+
+  var moveis = getFeriadosMoveis(ano);
+  var todosFeriados = feriadosNacionais.concat(feriadosGoias).concat(moveis);
+
+  for (var dia = 1; dia <= totalDias; dia++) {
+    var data = new Date(ano, mes - 1, dia);
+    var diaSemana = data.getDay(); // 0=dom, 6=sab
+    if (diaSemana === 0 || diaSemana === 6) continue; // pula fim de semana
+
+    var feriado = todosFeriados.find(function(f){ return f.d === dia && f.m === mes; });
+    if (feriado) {
+      feriadosDoMes.push({dia: dia, nome: feriado.n, data: data});
+      continue; // dia útil que é feriado: não trabalha
+    }
+    diasUteis.push(dia);
+  }
+
+  // Agrupa por semanas (seg a sex)
+  var semanas = [];
+  var semanaAtual = null;
+  var semanaNum = 0;
+
+  for (var dia = 1; dia <= totalDias; dia++) {
+    var data = new Date(ano, mes - 1, dia);
+    var diaSemana = data.getDay();
+
+    if (diaSemana === 1) { // segunda — começa nova semana
+      semanaNum++;
+      semanaAtual = { num: semanaNum, dias: [], feriados: [], inicio: dia };
+      semanas.push(semanaAtual);
+    }
+    if (!semanaAtual && diaSemana !== 0 && diaSemana !== 6) {
+      // Mês começa no meio da semana
+      semanaNum++;
+      semanaAtual = { num: semanaNum, dias: [], feriados: [], inicio: dia };
+      semanas.push(semanaAtual);
+    }
+    if (!semanaAtual) continue;
+
+    if (diaSemana >= 1 && diaSemana <= 5) {
+      var feriado = todosFeriados.find(function(f){ return f.d === dia && f.m === mes; });
+      if (feriado) {
+        semanaAtual.feriados.push({dia: dia, nome: feriado.n});
+      } else {
+        semanaAtual.dias.push(dia);
+      }
+    }
+
+    if (diaSemana === 5 || dia === totalDias) {
+      semanaAtual = null; // fecha semana na sexta
+    }
+  }
+
+  var totalDiasUteis = diasUteis.length;
+  var valorDia = passagem * passagensDia;
+  var valorSemana = 0; // calculado por semana
+  var valorMes = totalDiasUteis * valorDia;
+  var valor15dias = Math.round(totalDiasUteis / 2) * valorDia;
+
+  // HTML resultado
+  var html = '';
+
+  // Cards de resumo
+  html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:1.25rem">';
+
+  html += '<div class="card" style="text-align:center;margin-bottom:0;background:var(--bg3)">' +
+    '<div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:6px">Por semana</div>' +
+    '<div style="font-family:Rajdhani,sans-serif;font-size:11px;color:var(--dim);margin-bottom:4px">Varia por semana</div>' +
+    '<div style="font-size:11px;color:var(--muted)">'+passagensDia+'x R$ '+passagem.toFixed(2).replace('.',',')+'</div>' +
+  '</div>';
+
+  html += '<div class="card" style="text-align:center;margin-bottom:0;background:var(--bg3)">' +
+    '<div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:6px">15 dias</div>' +
+    '<div style="font-family:Rajdhani,sans-serif;font-size:22px;font-weight:700;color:var(--red-l)">' + fmtVT(valor15dias) + '</div>' +
+    '<div style="font-size:11px;color:var(--muted)">'+Math.round(totalDiasUteis/2)+' dias úteis</div>' +
+  '</div>';
+
+  html += '<div class="card" style="text-align:center;margin-bottom:0;background:var(--bg3)">' +
+    '<div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:6px">Mês completo</div>' +
+    '<div style="font-family:Rajdhani,sans-serif;font-size:22px;font-weight:700;color:var(--red-l)">' + fmtVT(valorMes) + '</div>' +
+    '<div style="font-size:11px;color:var(--muted)">'+totalDiasUteis+' dias úteis</div>' +
+  '</div>';
+
+  html += '</div>';
+
+  // Feriados do mês
+  if (feriadosDoMes.length > 0) {
+    html += '<div class="card animate-in" style="margin-bottom:1.25rem">' +
+      '<div class="card-title">🗓 Feriados em ' + nomeMes + '</div>';
+    feriadosDoMes.forEach(function(f) {
+      var data = f.data;
+      var dias = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+      html += '<div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border)">' +
+        '<span style="font-family:Rajdhani,sans-serif;font-size:16px;font-weight:700;color:var(--warn);min-width:60px">' + String(f.dia).padStart(2,'0') + '/' + String(mes).padStart(2,'0') + '</span>' +
+        '<span style="font-size:12px;color:var(--muted);min-width:30px">' + dias[data.getDay()] + '</span>' +
+        '<span style="font-size:14px;color:var(--text)">' + f.nome + '</span>' +
+        '<span class="badge badge-warn" style="margin-left:auto">Não trabalha</span>' +
+      '</div>';
+    });
+    html += '</div>';
+  }
+
+  // Semanas detalhadas
+  html += '<div class="card animate-in" style="animation-delay:.1s">' +
+    '<div class="card-title">📅 Semanas de ' + nomeMes + '</div>';
+
+  semanas.forEach(function(s) {
+    var diasSemana = s.dias.length;
+    var valorSem = diasSemana * valorDia;
+    var temFeriado = s.feriados.length > 0;
+
+    html += '<div style="background:var(--bg2);border:1px solid var(--border' + (temFeriado ? '2' : '') + ');border-radius:var(--r);padding:12px 14px;margin-bottom:8px' + (temFeriado ? ';border-color:rgba(255,193,7,0.4)' : '') + '">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:' + (temFeriado ? '8' : '0') + 'px">' +
+        '<div>' +
+          '<span style="font-family:Rajdhani,sans-serif;font-size:15px;font-weight:700;color:var(--text)">Semana ' + s.num + '</span>' +
+          '<span style="font-size:12px;color:var(--muted);margin-left:8px">' + diasSemana + ' dia(s) útil(eis)</span>' +
+        '</div>' +
+        '<span style="font-family:Rajdhani,sans-serif;font-size:18px;font-weight:700;color:' + (temFeriado ? 'var(--warn)' : 'var(--red-l)') + '">' + fmtVT(valorSem) + '</span>' +
+      '</div>';
+
+    if (temFeriado) {
+      s.feriados.forEach(function(f) {
+        html += '<div style="font-size:12px;color:var(--warn);display:flex;align-items:center;gap:6px">' +
+          '<span>⚠</span><span>Feriado dia ' + String(f.dia).padStart(2,'0') + ': ' + f.nome + '</span>' +
+        '</div>';
+      });
+    }
+
+    html += '</div>';
+  });
+
+  html += '</div>';
+
+  // Info passagem
+  html += '<div style="font-size:12px;color:var(--dim);text-align:center;margin-bottom:1rem">' +
+    'Valor por dia: ' + passagensDia + ' passagem(ns) × R$ ' + passagem.toFixed(2).replace('.',',') + ' = R$ ' + valorDia.toFixed(2).replace('.',',') +
+    ' &nbsp;|&nbsp; Feriados nacionais + Goiás incluídos' +
+  '</div>';
+
+  el.innerHTML = html;
+}
+
+function fmtVT(v) {
+  return 'R$ ' + v.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
