@@ -149,6 +149,7 @@ function _pg(name) {
   if (name==='faltas')       { carregarSelectFuncs(); carregarFaltas(); }
   if (name==='vales')        { carregarSelectFuncs(); carregarVales(); }
   if (name==='folha')        carregarSelectFuncs();
+  if (name==='vt')           calcularVT();
 }
 
 // ─── CADASTRO ───────────────────────────────────────────────
@@ -367,41 +368,29 @@ async function carregarSelectFuncs() {
   } catch(e){}
 }
 
-// ─── VALES — SELEÇÃO DE FUNCIONÁRIOS ────────────────────────
-// Abordagem: checkbox real com label, sem onclick no div
+// ─── VALES — SELEÇÃO ────────────────────────────────────────
 
 function renderValeFunc(busca) {
   var el = document.getElementById('v-func-lista'); if (!el) return;
   var lista = _todosFunc.filter(function(f){ return f.nome.toLowerCase().includes((busca||'').toLowerCase()); });
   if (!lista.length) { el.innerHTML='<div style="text-align:center;padding:1rem;color:var(--dim);font-size:13px">Nenhum funcionário encontrado.</div>'; return; }
   el.innerHTML = lista.map(function(f) {
-    return '<label id="vfi-'+f.id+'" for="vfc-'+f.id+'" style="display:flex;align-items:center;gap:12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;transition:border-color .2s;cursor:pointer">' +
-      '<input type="checkbox" id="vfc-'+f.id+'" onchange="onValeCheck('+f.id+')" style="width:20px;height:20px;accent-color:#cc2222;cursor:pointer;flex-shrink:0;appearance:auto;-webkit-appearance:checkbox">' +
-      '<div style="flex:1;min-width:0;pointer-events:none">' +
-        '<div style="font-family:Rajdhani,sans-serif;font-size:15px;font-weight:700;color:var(--text)">'+f.nome+'</div>' +
-        '<div style="font-size:12px;color:var(--muted)">'+f.cargo+(f.departamento?' — '+f.departamento:'')+'</div>' +
+    return '<div id="vfi-'+f.id+'" style="display:flex;align-items:center;gap:12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;transition:border-color .2s">' +
+      '<div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0;cursor:pointer" onclick="onValeCheck('+f.id+')">' +
+        '<input type="checkbox" id="vfc-'+f.id+'" style="width:20px;height:20px;accent-color:#cc2222;cursor:pointer;flex-shrink:0;pointer-events:none">' +
+        '<div style="min-width:0">' +
+          '<div style="font-family:Rajdhani,sans-serif;font-size:15px;font-weight:700;color:var(--text)">'+f.nome+'</div>' +
+          '<div style="font-size:12px;color:var(--muted)">'+f.cargo+(f.departamento?' — '+f.departamento:'')+'</div>' +
+        '</div>' +
       '</div>' +
       '<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">' +
-        '<span style="font-size:12px;color:var(--muted);pointer-events:none">R$</span>' +
+        '<span style="font-size:12px;color:var(--muted)">R$</span>' +
         '<input type="number" id="vfv-'+f.id+'" placeholder="0,00" step="0.01" min="0" ' +
           'style="width:100px;opacity:.4;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:8px;color:var(--text);font-size:14px" ' +
-          'disabled ' +
-          'onclick="event.stopPropagation();event.preventDefault()" ' +
-          'onfocus="event.stopPropagation()">' +
+          'disabled>' +
       '</div>' +
-    '</label>';
+    '</div>';
   }).join('');
-
-  // Adiciona listener nos inputs de valor para não disparar o label
-  lista.forEach(function(f) {
-    var vinput = document.getElementById('vfv-'+f.id);
-    if (vinput) {
-      vinput.addEventListener('click', function(e){ e.stopPropagation(); });
-      vinput.addEventListener('focus', function(e){ e.stopPropagation(); });
-      vinput.addEventListener('mousedown', function(e){ e.stopPropagation(); });
-      vinput.addEventListener('touchstart', function(e){ e.stopPropagation(); }, {passive:true});
-    }
-  });
 }
 
 function onValeCheck(id) {
@@ -409,10 +398,11 @@ function onValeCheck(id) {
   var input = document.getElementById('vfv-'+id);
   var item = document.getElementById('vfi-'+id);
   if (!cb||!input||!item) return;
+  cb.checked = !cb.checked;
   input.disabled = !cb.checked;
   input.style.opacity = cb.checked ? '1' : '.4';
   item.style.borderColor = cb.checked ? 'var(--red)' : 'var(--border)';
-  if (cb.checked) { setTimeout(function(){ input.focus(); }, 80); }
+  if (cb.checked) setTimeout(function(){ input.focus(); }, 50);
 }
 
 function aplicarValorUnico() {
@@ -426,7 +416,7 @@ function aplicarValorUnico() {
   if (!temSelecionado) {
     _todosFunc.forEach(function(f) {
       var cb=document.getElementById('vfc-'+f.id);
-      if (cb && !cb.checked) { cb.checked=true; onValeCheck(f.id); }
+      if (cb && !cb.checked) onValeCheck(f.id);
     });
   }
   var aplicados = 0;
@@ -447,14 +437,14 @@ function filtrarValeFunc() {
 function selecionarTodosVale() {
   _todosFunc.forEach(function(f) {
     var cb=document.getElementById('vfc-'+f.id);
-    if (cb&&!cb.checked) { cb.checked=true; onValeCheck(f.id); }
+    if (cb&&!cb.checked) onValeCheck(f.id);
   });
 }
 
 function deselecionarTodosVale() {
   _todosFunc.forEach(function(f) {
     var cb=document.getElementById('vfc-'+f.id);
-    if (cb&&cb.checked) { cb.checked=false; onValeCheck(f.id); }
+    if (cb&&cb.checked) onValeCheck(f.id);
   });
 }
 
@@ -663,7 +653,6 @@ async function excluirVale(id) {
   } catch(e){}
 }
 
-
 // ─── FOLHA ───────────────────────────────────────────────────
 
 var _dadosFolha = null;
@@ -774,17 +763,14 @@ function renderFolhaHTML(data) {
     var totalRestante = parseFloat(data.total_geral);
     html+='<div class="total-geral" style="flex-direction:column;align-items:stretch;gap:8px">' +
       '<div style="display:flex;justify-content:space-between;align-items:center">' +
-        '<div class="lbl">Total bruto da folha</div>' +
-        '<div class="val">'+fmt(totalBruto)+'</div>' +
+        '<div class="lbl">Total bruto da folha</div><div class="val">'+fmt(totalBruto)+'</div>' +
       '</div>' +
       (totalVales>0 ?
         '<div style="display:flex;justify-content:space-between;align-items:center;opacity:.85">' +
-          '<div class="lbl">(-) Total de vales pagos</div>' +
-          '<div class="val" style="font-size:18px">- '+fmt(totalVales)+'</div>' +
+          '<div class="lbl">(-) Total de vales pagos</div><div class="val" style="font-size:18px">- '+fmt(totalVales)+'</div>' +
         '</div>' +
         '<div style="border-top:1px solid rgba(255,255,255,0.2);padding-top:8px;display:flex;justify-content:space-between;align-items:center">' +
-          '<div class="lbl">Restante a pagar</div>' +
-          '<div class="val">'+fmt(totalRestante)+'</div>' +
+          '<div class="lbl">Restante a pagar</div><div class="val">'+fmt(totalRestante)+'</div>' +
         '</div>'
       : '') +
     '</div>';
@@ -859,12 +845,12 @@ function imprimirFolha() {
     '</tr>';
   });
   var totalValesImp = _dadosFolha.data.reduce(function(s,r){ return s + (r.valorVale>0 ? parseFloat(r.valorVale) : 0); }, 0);
-var totalBrutoImp = totalGeral + totalValesImp;
-html += '<tr class="total-row"><td colspan="7">TOTAL BRUTO DA FOLHA</td><td class="num">'+fmt(totalBrutoImp)+'</td></tr>';
-if (totalValesImp > 0) {
-  html += '<tr style="background:#fff8f0"><td colspan="7" style="color:#b8860b;font-weight:600">(-) Total de vales pagos</td><td class="num" style="color:#b8860b;font-weight:600">- '+fmt(totalValesImp)+'</td></tr>';
-  html += '<tr class="total-row" style="background:#fff0f0"><td colspan="7">RESTANTE A PAGAR</td><td class="num">'+fmt(totalGeral)+'</td></tr>';
-}
+  var totalBrutoImp = totalGeral + totalValesImp;
+  html += '<tr class="total-row"><td colspan="7">TOTAL BRUTO DA FOLHA</td><td class="num">'+fmt(totalBrutoImp)+'</td></tr>';
+  if (totalValesImp > 0) {
+    html += '<tr style="background:#fff8f0"><td colspan="7" style="color:#b8860b;font-weight:600">(-) Total de vales pagos</td><td class="num" style="color:#b8860b;font-weight:600">- '+fmt(totalValesImp)+'</td></tr>';
+    html += '<tr class="total-row" style="background:#fff0f0"><td colspan="7">RESTANTE A PAGAR</td><td class="num">'+fmt(totalGeral)+'</td></tr>';
+  }
   html += '</tbody></table><div class="rodape">MRA Mochilas e Bolsas — '+new Date().toLocaleString('pt-BR')+'</div></body></html>';
   _abrirJanela(html);
 }
@@ -933,7 +919,6 @@ function imprimirFuncionario(funcId) {
     '.rec-ass-label{font-size:10px;font-weight:700;color:#222}' +
     '.rec-ass-sub{font-size:9px;color:#888}' +
     '.rec-rodape{text-align:center;font-size:8px;color:#bbb;margin-top:3px}';
-
   function blocoRecibo(titulo) {
     var cpf = f.cpf||'—', admissao = f.admissao?fmtData(f.admissao):'—', depto = f.departamento||'—';
     var geradoEm = new Date().toLocaleDateString('pt-BR');
@@ -983,29 +968,8 @@ function imprimirFuncionario(funcId) {
   _abrirJanela(html);
 }
 
-// ─── INIT ────────────────────────────────────────────────────
-
-(function(){
-  var hoje=new Date();
-  var m=String(hoje.getMonth()+1).padStart(2,'0');
-  var mesAtual=hoje.getFullYear()+'-'+m;
-  var fm=document.getElementById('folha-mes'); if(fm) fm.value=mesAtual;
-  var vm=document.getElementById('v-mes'); if(vm) vm.value=mesAtual;
-  var fvm=document.getElementById('filtro-mes-vale'); if(fvm) fvm.value=mesAtual;
-  var fa=document.getElementById('c-admissao');
-  if(fa) {
-    var d=String(hoje.getDate()).padStart(2,'0');
-    var mo=String(hoje.getMonth()+1).padStart(2,'0');
-    fa.value = d+'/'+mo+'/'+hoje.getFullYear();
-  }
-  atualizarDiasMes();
-  renderGratsTemp();
-  atualizarBadgeFuncs();
-})();
-
 // ─── VALE TRANSPORTE ─────────────────────────────────────────
 
-// Feriados nacionais fixos (dia/mes)
 var feriadosNacionais = [
   {d:1,  m:1,  n:'Confraternização Universal'},
   {d:21, m:4,  n:'Tiradentes'},
@@ -1018,67 +982,42 @@ var feriadosNacionais = [
   {d:25, m:12, n:'Natal'},
 ];
 
-// Feriados de Goiás fixos (dia/mes)
 var feriadosGoias = [
   {d:26, m:7,  n:'Aniversário de Goiânia'},
   {d:24, m:10, n:'Pedra Fundamental de Goiás'},
 ];
 
-// Páscoa (algoritmo de Gauss)
 function calcularPascoa(ano) {
-  var a = ano % 19;
-  var b = Math.floor(ano / 100);
-  var c = ano % 100;
-  var d = Math.floor(b / 4);
-  var e = b % 4;
-  var f = Math.floor((b + 8) / 25);
-  var g = Math.floor((b - f + 1) / 3);
-  var h = (19 * a + b - d - g + 15) % 30;
-  var i = Math.floor(c / 4);
-  var k = c % 4;
-  var l = (32 + 2 * e + 2 * i - h - k) % 7;
-  var m = Math.floor((a + 11 * h + 22 * l) / 451);
-  var mes = Math.floor((h + l - 7 * m + 114) / 31);
-  var dia = ((h + l - 7 * m + 114) % 31) + 1;
-  return new Date(ano, mes - 1, dia);
+  var a=ano%19, b=Math.floor(ano/100), c=ano%100, d=Math.floor(b/4), e=b%4;
+  var f=Math.floor((b+8)/25), g=Math.floor((b-f+1)/3);
+  var h=(19*a+b-d-g+15)%30, i=Math.floor(c/4), k=c%4;
+  var l=(32+2*e+2*i-h-k)%7, m=Math.floor((a+11*h+22*l)/451);
+  var mes=Math.floor((h+l-7*m+114)/31), dia=((h+l-7*m+114)%31)+1;
+  return new Date(ano, mes-1, dia);
 }
 
 function getFeriadosMoveis(ano) {
-  var pascoa = calcularPascoa(ano);
-  var result = [];
-
-  // Carnaval: -47 dias antes da Páscoa
-  var carnaval = new Date(pascoa); carnaval.setDate(carnaval.getDate() - 47);
-  result.push({d: carnaval.getDate(), m: carnaval.getMonth()+1, n: 'Carnaval'});
-
-  // Sexta-feira Santa: -2 dias
-  var sextaSanta = new Date(pascoa); sextaSanta.setDate(sextaSanta.getDate() - 2);
-  result.push({d: sextaSanta.getDate(), m: sextaSanta.getMonth()+1, n: 'Sexta-feira Santa'});
-
-  // Páscoa
-  result.push({d: pascoa.getDate(), m: pascoa.getMonth()+1, n: 'Páscoa'});
-
-  // Corpus Christi: +60 dias
-  var corpus = new Date(pascoa); corpus.setDate(corpus.getDate() + 60);
-  result.push({d: corpus.getDate(), m: corpus.getMonth()+1, n: 'Corpus Christi'});
-
+  var pascoa = calcularPascoa(ano), result = [];
+  var carnaval = new Date(pascoa); carnaval.setDate(carnaval.getDate()-47);
+  result.push({d:carnaval.getDate(), m:carnaval.getMonth()+1, n:'Carnaval'});
+  var sextaSanta = new Date(pascoa); sextaSanta.setDate(sextaSanta.getDate()-2);
+  result.push({d:sextaSanta.getDate(), m:sextaSanta.getMonth()+1, n:'Sexta-feira Santa'});
+  result.push({d:pascoa.getDate(), m:pascoa.getMonth()+1, n:'Páscoa'});
+  var corpus = new Date(pascoa); corpus.setDate(corpus.getDate()+60);
+  result.push({d:corpus.getDate(), m:corpus.getMonth()+1, n:'Corpus Christi'});
   return result;
 }
 
-function isFeriado(data, ano) {
-  var d = data.getDate();
-  var m = data.getMonth() + 1;
-  var moveis = getFeriadosMoveis(ano);
-  var todos = feriadosNacionais.concat(feriadosGoias).concat(moveis);
-  return todos.find(function(f){ return f.d === d && f.m === m; });
+function fmtVT(v) {
+  return 'R$ ' + v.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 }
 
 function calcularVT() {
-  var mesInput = document.getElementById('vt-mes').value;
-  var passagem = parseFloat(document.getElementById('vt-passagem').value) || 4.30;
-  var passagensDia = parseInt(document.getElementById('vt-passagens-dia').value) || 2;
+  var mesInput = document.getElementById('vt-mes') ? document.getElementById('vt-mes').value : '';
+  var passagem = parseFloat(document.getElementById('vt-passagem') ? document.getElementById('vt-passagem').value : 4.30) || 4.30;
+  var passagensDia = parseInt(document.getElementById('vt-passagens-dia') ? document.getElementById('vt-passagens-dia').value : 2) || 2;
   var el = document.getElementById('vt-resultado');
-
+  if (!el) return;
   if (!mesInput) { el.innerHTML = ''; return; }
 
   var partes = mesInput.split('-');
@@ -1090,65 +1029,48 @@ function calcularVT() {
   var todosFeriados = feriadosNacionais.concat(feriadosGoias).concat(moveis);
 
   function ehFeriado(d) {
-    return todosFeriados.find(function(f){ return f.d === d.getDate() && f.m === d.getMonth()+1; });
+    return todosFeriados.find(function(f){ return f.d===d.getDate() && f.m===d.getMonth()+1; });
   }
 
-  // Encontra a primeira segunda-feira da semana que contém o dia 1 do mês
-  var primeiroDia = new Date(ano, mes - 1, 1);
-  var diaSemana = primeiroDia.getDay(); // 0=dom, 1=seg...
-  // Volta até a segunda-feira dessa semana
-  var offset = diaSemana === 0 ? -6 : -(diaSemana - 1);
-  var inicioSemanas = new Date(primeiroDia);
-  inicioSemanas.setDate(inicioSemanas.getDate() + offset);
+  var primeiroDia = new Date(ano, mes-1, 1);
+  var diaSemana = primeiroDia.getDay();
+  var offset = diaSemana===0 ? -6 : -(diaSemana-1);
+  var cursor = new Date(primeiroDia);
+  cursor.setDate(cursor.getDate()+offset);
 
-  // Coleta semanas que têm pelo menos 1 dia no mês selecionado
   var semanas = [];
-  var cursor = new Date(inicioSemanas);
-  var ultimoDiaMes = new Date(ano, mes, 0).getDate();
-
   while (true) {
-    // Verifica se esta semana tem algum dia no mês
-    var fimSemana = new Date(cursor);
-    fimSemana.setDate(fimSemana.getDate() + 4); // sexta
-
+    var fimSemana = new Date(cursor); fimSemana.setDate(fimSemana.getDate()+4);
     var temDiaNoMes = false;
-    for (var i = 0; i < 5; i++) {
-      var d = new Date(cursor); d.setDate(d.getDate() + i);
-      if (d.getMonth() + 1 === mes && d.getFullYear() === ano) { temDiaNoMes = true; break; }
+    for (var i=0; i<5; i++) {
+      var d = new Date(cursor); d.setDate(d.getDate()+i);
+      if (d.getMonth()+1===mes && d.getFullYear()===ano) { temDiaNoMes=true; break; }
     }
     if (!temDiaNoMes) break;
-
-    // Monta semana
-    var semana = { dias: [], feriados: [], inicio: new Date(cursor), fim: new Date(fimSemana) };
-    for (var i = 0; i < 5; i++) {
-      var d = new Date(cursor); d.setDate(d.getDate() + i);
+    var semana = {dias:[], feriados:[], inicio:new Date(cursor), fim:new Date(fimSemana)};
+    for (var i=0; i<5; i++) {
+      var d = new Date(cursor); d.setDate(d.getDate()+i);
       var feriado = ehFeriado(d);
-      if (feriado) {
-        semana.feriados.push({ dia: d.getDate(), mes: d.getMonth()+1, nome: feriado.n, data: new Date(d) });
-      } else {
-        semana.dias.push(new Date(d));
-      }
+      if (feriado) semana.feriados.push({dia:d.getDate(), mes:d.getMonth()+1, nome:feriado.n, data:new Date(d)});
+      else semana.dias.push(new Date(d));
     }
     semanas.push(semana);
-
-    cursor.setDate(cursor.getDate() + 7);
+    cursor.setDate(cursor.getDate()+7);
   }
 
-  // Calcula totais
   var valorDia = passagem * passagensDia;
-  var totalDiasUteis = semanas.reduce(function(s,sem){ return s + sem.dias.length; }, 0);
+  var totalDiasUteis = semanas.reduce(function(s,sem){ return s+sem.dias.length; }, 0);
   var valorMes = totalDiasUteis * valorDia;
-  var valor15dias = Math.ceil(totalDiasUteis / 2) * valorDia;
+  var valor15dias = Math.ceil(totalDiasUteis/2) * valorDia;
 
   var fmtDate = function(d) {
-    return String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0');
+    return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0');
   };
 
-  // Feriados que caem em dias úteis do mês
   var feriadosDoMes = [];
   semanas.forEach(function(s) {
     s.feriados.forEach(function(f) {
-      if (f.mes === mes && f.data.getFullYear() === ano) feriadosDoMes.push(f);
+      if (f.mes===mes && f.data.getFullYear()===ano) feriadosDoMes.push(f);
     });
   });
 
@@ -1156,37 +1078,32 @@ function calcularVT() {
 
   // Cards resumo
   html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:1.25rem">';
-
   html += '<div class="card" style="text-align:center;margin-bottom:0">' +
     '<div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:6px">Por semana</div>' +
     '<div style="font-family:Rajdhani,sans-serif;font-size:14px;color:var(--dim)">Varia por semana</div>' +
     '<div style="font-size:11px;color:var(--muted);margin-top:4px">'+passagensDia+'x R$ '+passagem.toFixed(2).replace('.',',')+'</div>' +
   '</div>';
-
   html += '<div class="card" style="text-align:center;margin-bottom:0">' +
     '<div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:6px">15 dias</div>' +
-    '<div style="font-family:Rajdhani,sans-serif;font-size:22px;font-weight:700;color:var(--red-l)">' + fmtVT(valor15dias) + '</div>' +
+    '<div style="font-family:Rajdhani,sans-serif;font-size:22px;font-weight:700;color:var(--red-l)">'+fmtVT(valor15dias)+'</div>' +
     '<div style="font-size:11px;color:var(--muted)">'+Math.ceil(totalDiasUteis/2)+' dias úteis</div>' +
   '</div>';
-
   html += '<div class="card" style="text-align:center;margin-bottom:0">' +
     '<div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:6px">Mês completo</div>' +
-    '<div style="font-family:Rajdhani,sans-serif;font-size:22px;font-weight:700;color:var(--red-l)">' + fmtVT(valorMes) + '</div>' +
+    '<div style="font-family:Rajdhani,sans-serif;font-size:22px;font-weight:700;color:var(--red-l)">'+fmtVT(valorMes)+'</div>' +
     '<div style="font-size:11px;color:var(--muted)">'+totalDiasUteis+' dias úteis</div>' +
   '</div>';
-
   html += '</div>';
 
-  // Feriados do mês
+  // Feriados
   if (feriadosDoMes.length > 0) {
-    var dias = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
-    html += '<div class="card animate-in" style="margin-bottom:1.25rem">' +
-      '<div class="card-title">🗓 Feriados em ' + nomeMes + '</div>';
+    var diasNome = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+    html += '<div class="card animate-in" style="margin-bottom:1.25rem"><div class="card-title">🗓 Feriados em '+nomeMes+'</div>';
     feriadosDoMes.forEach(function(f) {
       html += '<div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border)">' +
-        '<span style="font-family:Rajdhani,sans-serif;font-size:16px;font-weight:700;color:var(--warn);min-width:50px">' + String(f.dia).padStart(2,'0') + '/' + String(f.mes).padStart(2,'0') + '</span>' +
-        '<span style="font-size:12px;color:var(--muted);min-width:28px">' + dias[f.data.getDay()] + '</span>' +
-        '<span style="font-size:14px;color:var(--text)">' + f.nome + '</span>' +
+        '<span style="font-family:Rajdhani,sans-serif;font-size:16px;font-weight:700;color:var(--warn);min-width:50px">'+String(f.dia).padStart(2,'0')+'/'+String(f.mes).padStart(2,'0')+'</span>' +
+        '<span style="font-size:12px;color:var(--muted);min-width:28px">'+diasNome[f.data.getDay()]+'</span>' +
+        '<span style="font-size:14px;color:var(--text)">'+f.nome+'</span>' +
         '<span class="badge badge-warn" style="margin-left:auto">Não trabalha</span>' +
       '</div>';
     });
@@ -1194,42 +1111,53 @@ function calcularVT() {
   }
 
   // Semanas
-  html += '<div class="card animate-in" style="animation-delay:.1s">' +
-    '<div class="card-title">📅 Semanas — pagamento toda segunda-feira</div>';
-
+  html += '<div class="card animate-in" style="animation-delay:.1s"><div class="card-title">📅 Semanas — pagamento toda segunda-feira</div>';
   semanas.forEach(function(s, idx) {
     var diasUteisSem = s.dias.length;
     var valorSem = diasUteisSem * valorDia;
     var temFeriado = s.feriados.length > 0;
-    var periodo = fmtDate(s.inicio) + ' a ' + fmtDate(s.fim);
-
-    html += '<div style="background:var(--bg2);border:1px solid ' + (temFeriado ? 'rgba(255,193,7,0.4)' : 'var(--border)') + ';border-radius:var(--r);padding:12px 14px;margin-bottom:8px">' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:' + (temFeriado ? '8' : '0') + 'px">' +
+    var periodo = fmtDate(s.inicio)+' a '+fmtDate(s.fim);
+    html += '<div style="background:var(--bg2);border:1px solid '+(temFeriado?'rgba(255,193,7,0.4)':'var(--border)')+';border-radius:var(--r);padding:12px 14px;margin-bottom:8px">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:'+(temFeriado?'8':'0')+'px">' +
         '<div>' +
-          '<span style="font-family:Rajdhani,sans-serif;font-size:15px;font-weight:700;color:var(--text)">Semana ' + (idx+1) + '</span>' +
-          '<span style="font-size:12px;color:var(--muted);margin-left:8px">' + periodo + '</span>' +
-          '<span style="font-size:12px;color:var(--muted);margin-left:8px">(' + diasUteisSem + ' dias úteis)</span>' +
+          '<span style="font-family:Rajdhani,sans-serif;font-size:15px;font-weight:700;color:var(--text)">Semana '+(idx+1)+'</span>' +
+          '<span style="font-size:12px;color:var(--muted);margin-left:8px">'+periodo+'</span>' +
+          '<span style="font-size:12px;color:var(--muted);margin-left:8px">('+diasUteisSem+' dias úteis)</span>' +
         '</div>' +
-        '<span style="font-family:Rajdhani,sans-serif;font-size:18px;font-weight:700;color:' + (temFeriado ? 'var(--warn)' : 'var(--red-l)') + '">' + fmtVT(valorSem) + '</span>' +
+        '<span style="font-family:Rajdhani,sans-serif;font-size:18px;font-weight:700;color:'+(temFeriado?'var(--warn)':'var(--red-l)')+'">'+fmtVT(valorSem)+'</span>' +
       '</div>';
-
     if (temFeriado) {
       s.feriados.forEach(function(f) {
-        html += '<div style="font-size:12px;color:var(--warn);display:flex;align-items:center;gap:6px;margin-top:2px">' +
-          '<span>⚠</span><span>Feriado ' + fmtDate(f.data) + ': ' + f.nome + '</span>' +
-        '</div>';
+        html += '<div style="font-size:12px;color:var(--warn);display:flex;align-items:center;gap:6px;margin-top:2px"><span>⚠</span><span>Feriado '+fmtDate(f.data)+': '+f.nome+'</span></div>';
       });
     }
-
     html += '</div>';
   });
-
   html += '</div>';
-
-  html += '<div style="font-size:12px;color:var(--dim);text-align:center;margin-bottom:1rem">' +
-    'Valor por dia: ' + passagensDia + ' passagem(ns) × R$ ' + passagem.toFixed(2).replace('.',',') + ' = R$ ' + valorDia.toFixed(2).replace('.',',') +
-    ' &nbsp;|&nbsp; Feriados nacionais + Goiás incluídos' +
-  '</div>';
+  html += '<div style="font-size:12px;color:var(--dim);text-align:center;margin-bottom:1rem">Valor por dia: '+passagensDia+' passagem(ns) × R$ '+passagem.toFixed(2).replace('.',',')+' = R$ '+valorDia.toFixed(2).replace('.',',')+' &nbsp;|&nbsp; Feriados nacionais + Goiás incluídos</div>';
 
   el.innerHTML = html;
 }
+
+// ─── INIT ────────────────────────────────────────────────────
+
+(function(){
+  var hoje=new Date();
+  var m=String(hoje.getMonth()+1).padStart(2,'0');
+  var mesAtual=hoje.getFullYear()+'-'+m;
+  var fm=document.getElementById('folha-mes'); if(fm) fm.value=mesAtual;
+  var vm=document.getElementById('v-mes'); if(vm) vm.value=mesAtual;
+  var fvm=document.getElementById('filtro-mes-vale'); if(fvm) fvm.value=mesAtual;
+  var vtm=document.getElementById('vt-mes'); if(vtm) vtm.value=mesAtual;
+  var fa=document.getElementById('c-admissao');
+  if(fa) {
+    var d=String(hoje.getDate()).padStart(2,'0');
+    var mo=String(hoje.getMonth()+1).padStart(2,'0');
+    fa.value = d+'/'+mo+'/'+hoje.getFullYear();
+  }
+  atualizarDiasMes();
+  renderGratsTemp();
+  atualizarBadgeFuncs();
+  // Calcula VT ao carregar se a página VT estiver ativa
+  setTimeout(function(){ calcularVT(); }, 200);
+})();
