@@ -915,23 +915,14 @@ function imprimirFuncionario(funcId) {
     '.rec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}' +
     '.rec-field{display:flex;flex-direction:column}' +
     '.rec-label{font-size:8px;text-transform:uppercase;color:#999;letter-spacing:.3px}' +
-    '.rec-value{font-size:12px;color:#1a1a1a}.bold{font-weight:700}.red{color:#cc2222}' +
-    '.rec-rescisao{background:#fff0f0;border:1px solid #ffcccc;border-radius:3px;padding:2px 6px;font-size:10px;color:#cc2222;font-weight:600;margin-top:2px}' +
-    '.rec-table{width:100%;border-collapse:collapse;margin-bottom:4px}' +
-    '.rec-table thead th{background:#cc2222;color:#fff;padding:4px 8px;font-size:11px;text-transform:uppercase}' +
-    '.rec-table tbody td{padding:4px 8px;border-bottom:1px solid #eee;font-size:12px}' +
-    '.rec-table tbody tr:nth-child(even) td{background:#fafafa}.right{text-align:right}' +
-    '.pos{color:#2e7d32;text-align:right}.neg{color:#cc2222;text-align:right}.cut{text-decoration:line-through;color:#aaa;text-align:right}' +
-    '.rec-total td{font-weight:700;padding:5px 8px;border-top:2px solid #cc2222;background:#fff5f5;font-size:14px}' +
-    '.rec-ocorrencia{font-size:10px;padding:2px 0;border-bottom:1px dashed #eee;color:#555}' +
-    '.rec-tipo-falta{color:#cc2222;font-weight:600}.rec-tipo-just{color:#b8860b;font-weight:600}' +
-    '.rec-assinatura{margin-top:auto;padding-top:2px}' +
-    '.rec-ass-texto{font-size:11px;color:#333;margin-bottom:6px;line-height:1.5;text-align:justify;font-weight:500}' +
-    '.rec-ass-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:3px}' +
-    '.rec-ass-item{text-align:center}' +
-    '.rec-ass-linha{border-bottom:1.5px solid #333;height:18px;margin-bottom:3px}' +
-    '.rec-ass-label{font-size:10px;font-weight:700;color:#222}' +
-    '.rec-ass-sub{font-size:9px;color:#888}' +
+    '.rec-value{font-size:15px;color:#1a1a1a}.bold{font-weight:700}.red{color:#cc2222}' +
+    '.rec-table tbody td{padding:5px 8px;border-bottom:1px solid #eee;font-size:15px}' +
+    '.rec-table thead th{background:#cc2222;color:#fff;padding:5px 8px;font-size:13px;text-transform:uppercase}' +
+    '.rec-total td{font-weight:700;padding:6px 8px;border-top:2px solid #cc2222;background:#fff5f5;font-size:17px}' +
+    '.rec-titulo{font-size:14px;font-weight:700;color:#333;text-align:right;text-transform:uppercase}' +
+    '.rec-ass-texto{font-size:13px;color:#333;margin-bottom:6px;line-height:1.5;text-align:justify;font-weight:500}' +
+    '.rec-ass-label{font-size:12px;font-weight:700;color:#222}' +
+    '.rec-ass-sub{font-size:10px;color:#888}' +
     '.rec-rodape{text-align:center;font-size:8px;color:#bbb;margin-top:3px}';
 
   function blocoRecibo(titulo) {
