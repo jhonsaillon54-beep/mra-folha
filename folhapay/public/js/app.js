@@ -1039,6 +1039,7 @@ function calcularVT() {
   cursor.setDate(cursor.getDate()+offset);
 
   var semanas = [];
+  var encontrouMes = false;
   while (true) {
     var fimSemana = new Date(cursor); fimSemana.setDate(fimSemana.getDate()+4);
     var temDiaNoMes = false;
@@ -1046,15 +1047,19 @@ function calcularVT() {
       var d = new Date(cursor); d.setDate(d.getDate()+i);
       if (d.getMonth()+1===mes && d.getFullYear()===ano) { temDiaNoMes=true; break; }
     }
-    if (!temDiaNoMes) break;
-    var semana = {dias:[], feriados:[], inicio:new Date(cursor), fim:new Date(fimSemana)};
-    for (var i=0; i<5; i++) {
-      var d = new Date(cursor); d.setDate(d.getDate()+i);
-      var feriado = ehFeriado(d);
-      if (feriado) semana.feriados.push({dia:d.getDate(), mes:d.getMonth()+1, nome:feriado.n, data:new Date(d)});
-      else semana.dias.push(new Date(d));
+    if (temDiaNoMes) {
+      encontrouMes = true;
+      var semana = {dias:[], feriados:[], inicio:new Date(cursor), fim:new Date(fimSemana)};
+      for (var i=0; i<5; i++) {
+        var d = new Date(cursor); d.setDate(d.getDate()+i);
+        var feriado = ehFeriado(d);
+        if (feriado) semana.feriados.push({dia:d.getDate(), mes:d.getMonth()+1, nome:feriado.n, data:new Date(d)});
+        else semana.dias.push(new Date(d));
+      }
+      semanas.push(semana);
+    } else if (encontrouMes) {
+      break;
     }
-    semanas.push(semana);
     cursor.setDate(cursor.getDate()+7);
   }
 
