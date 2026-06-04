@@ -903,7 +903,7 @@ function imprimirFuncionario(funcId) {
     '.pagina{width:210mm;height:297mm;display:flex;flex-direction:column;overflow:hidden;page-break-inside:avoid}' +
     '.recibo{width:210mm;height:142mm;padding:5mm 14mm;display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}' +
     '.corte{display:flex;align-items:center;gap:6px;padding:0 14mm;height:13mm;flex-shrink:0}' +
-    '.corte-linha{flex:1;border-top:1.5px dashed #999}' +
+    '.corte-linha{flex:1;border-top:1.5px dashed #999}' +'.rec-ass-texto{font-size:9px;color:#555;margin-bottom:6px;line-height:1.4;text-align:justify}' +
     '.corte-texto{font-size:9px;color:#999;letter-spacing:2px;white-space:nowrap;padding:0 4px}' +
     '.rec-header{display:flex;justify-content:space-between;align-items:center;padding-bottom:4px;border-bottom:2px solid #cc2222;margin-bottom:5px}' +
     '.rec-mra-box{display:inline-flex;flex-direction:column;align-items:center;border:2px solid #111;border-radius:2px;padding:3px 10px;line-height:1;gap:1px}' +
@@ -925,14 +925,14 @@ function imprimirFuncionario(funcId) {
     '.rec-total td{font-weight:700;padding:4px 6px;border-top:2px solid #cc2222;background:#fff5f5;font-size:12px}' +
     '.rec-ocorrencia{font-size:9px;padding:2px 0;border-bottom:1px dashed #eee;color:#555}' +
     '.rec-tipo-falta{color:#cc2222;font-weight:600}.rec-tipo-just{color:#b8860b;font-weight:600}' +
-    '.rec-assinatura{margin-top:auto;padding-top:4px}' +
-    '.rec-ass-texto{font-size:9px;color:#555;margin-bottom:6px;line-height:1.4;text-align:justify}' +
+    '.rec-assinatura{margin-top:8px;padding-top:4px}' +
+    '.rec-ass-texto{font-size:12px;color:#333;margin-bottom:8px;line-height:1.5;text-align:justify;font-weight:500}' +
     '.rec-ass-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:3px}' +
     '.rec-ass-item{text-align:center}.rec-ass-linha{border-bottom:1px solid #333;height:16px;margin-bottom:3px}' +
     '.rec-ass-label{font-size:9px;font-weight:600;color:#333}.rec-ass-sub{font-size:8px;color:#888}' +
     '.rec-rodape{text-align:center;font-size:8px;color:#bbb;margin-top:3px}';
 
-    
+
   function blocoRecibo(titulo) {
     var cpf = f.cpf||'—', admissao = f.admissao?fmtData(f.admissao):'—', depto = f.departamento||'—';
     var geradoEm = new Date().toLocaleDateString('pt-BR');
