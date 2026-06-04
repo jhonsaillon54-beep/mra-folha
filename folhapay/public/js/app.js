@@ -897,40 +897,42 @@ function imprimirFuncionario(funcId) {
   }
   var css =
     '*{box-sizing:border-box;margin:0;padding:0}' +
-    'body{font-family:Arial,sans-serif;font-size:9px;color:#1a1a1a;background:#fff}' +
+    'body{font-family:Arial,sans-serif;font-size:11px;color:#1a1a1a;background:#fff}' +
     '@page{size:A4;margin:0}' +
     '@media print{body{margin:0}html,body{height:100%}}' +
     '.pagina{width:210mm;height:297mm;display:flex;flex-direction:column;overflow:hidden;page-break-inside:avoid}' +
-    '.recibo{width:210mm;height:142mm;padding:5mm 12mm;display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}' +
-    '.corte{display:flex;align-items:center;gap:6px;padding:0 12mm;height:13mm;flex-shrink:0}' +
+    '.recibo{width:210mm;height:142mm;padding:5mm 14mm;display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}' +
+    '.corte{display:flex;align-items:center;gap:6px;padding:0 14mm;height:13mm;flex-shrink:0}' +
     '.corte-linha{flex:1;border-top:1.5px dashed #999}' +
-    '.corte-texto{font-size:8px;color:#999;letter-spacing:2px;white-space:nowrap;padding:0 4px}' +
-    '.rec-header{display:flex;justify-content:space-between;align-items:center;padding-bottom:3px;border-bottom:2px solid #cc2222;margin-bottom:4px}' +
-    '.rec-mra-box{display:inline-flex;flex-direction:column;align-items:center;border:2px solid #111;border-radius:2px;padding:2px 8px;line-height:1;gap:1px}' +
-    '.rec-mra-sigla{font-size:16px;font-weight:900;color:#cc2222;letter-spacing:2px;line-height:1;font-family:Arial Black,Arial}' +
-    '.rec-mra-sub{font-size:6px;font-weight:700;color:#cc2222;letter-spacing:1.5px;white-space:nowrap}' +
-    '.rec-titulo{font-size:9px;font-weight:700;color:#333;text-align:right;text-transform:uppercase;letter-spacing:.3px}' +
-    '.rec-section{margin-bottom:3px;padding-bottom:2px;border-bottom:1px solid #eee}' +
-    '.rec-section-title{font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#cc2222;margin-bottom:2px;padding-bottom:2px;border-bottom:1px solid #ffcccc}' +
-    '.rec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}' +
+    '.corte-texto{font-size:9px;color:#999;letter-spacing:2px;white-space:nowrap;padding:0 4px}' +
+    '.rec-header{display:flex;justify-content:space-between;align-items:center;padding-bottom:4px;border-bottom:2px solid #cc2222;margin-bottom:5px}' +
+    '.rec-mra-box{display:inline-flex;flex-direction:column;align-items:center;border:2px solid #111;border-radius:2px;padding:3px 10px;line-height:1;gap:1px}' +
+    '.rec-mra-sigla{font-size:20px;font-weight:900;color:#cc2222;letter-spacing:2px;line-height:1;font-family:Arial Black,Arial}' +
+    '.rec-mra-sub{font-size:7px;font-weight:700;color:#cc2222;letter-spacing:1.5px;white-space:nowrap}' +
+    '.rec-titulo{font-size:11px;font-weight:700;color:#333;text-align:right;text-transform:uppercase;letter-spacing:.3px}' +
+    '.rec-section{margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #eee}' +
+    '.rec-section-title{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#cc2222;margin-bottom:3px;padding-bottom:2px;border-bottom:1px solid #ffcccc}' +
+    '.rec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}' +
     '.rec-field{display:flex;flex-direction:column;gap:0}' +
-    '.rec-label{font-size:7px;text-transform:uppercase;letter-spacing:.3px;color:#999}' +
-    '.rec-value{font-size:8.5px;color:#1a1a1a}.bold{font-weight:700}.red{color:#cc2222}' +
-    '.rec-rescisao{background:#fff0f0;border:1px solid #ffcccc;border-radius:3px;padding:2px 5px;font-size:8px;color:#cc2222;font-weight:600;margin-top:2px}' +
+    '.rec-label{font-size:8px;text-transform:uppercase;letter-spacing:.3px;color:#999}' +
+    '.rec-value{font-size:11px;color:#1a1a1a}.bold{font-weight:700}.red{color:#cc2222}' +
+    '.rec-rescisao{background:#fff0f0;border:1px solid #ffcccc;border-radius:3px;padding:2px 6px;font-size:9px;color:#cc2222;font-weight:600;margin-top:2px}' +
     '.rec-table{width:100%;border-collapse:collapse;margin-bottom:3px}' +
-    '.rec-table thead th{background:#cc2222;color:#fff;padding:2px 5px;font-size:7.5px;text-transform:uppercase}' +
-    '.rec-table tbody td{padding:2px 5px;border-bottom:1px solid #f0f0f0;font-size:8.5px}' +
+    '.rec-table thead th{background:#cc2222;color:#fff;padding:3px 6px;font-size:9px;text-transform:uppercase}' +
+    '.rec-table tbody td{padding:3px 6px;border-bottom:1px solid #f0f0f0;font-size:11px}' +
     '.rec-table tbody tr:nth-child(even) td{background:#fafafa}.right{text-align:right}' +
     '.pos{color:#2e7d32;text-align:right}.neg{color:#cc2222;text-align:right}.cut{text-decoration:line-through;color:#aaa;text-align:right}' +
-    '.rec-total td{font-weight:700;padding:3px 5px;border-top:1.5px solid #cc2222;background:#fff5f5;font-size:9px}' +
-    '.rec-ocorrencia{font-size:8px;padding:1px 0;border-bottom:1px dashed #eee;color:#555}' +
+    '.rec-total td{font-weight:700;padding:4px 6px;border-top:2px solid #cc2222;background:#fff5f5;font-size:12px}' +
+    '.rec-ocorrencia{font-size:9px;padding:2px 0;border-bottom:1px dashed #eee;color:#555}' +
     '.rec-tipo-falta{color:#cc2222;font-weight:600}.rec-tipo-just{color:#b8860b;font-weight:600}' +
-    '.rec-assinatura{margin-top:auto;padding-top:3px}' +
-    '.rec-ass-texto{font-size:7.5px;color:#555;margin-bottom:5px;line-height:1.3;text-align:justify}' +
-    '.rec-ass-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:3px}' +
-    '.rec-ass-item{text-align:center}.rec-ass-linha{border-bottom:1px solid #333;height:14px;margin-bottom:2px}' +
-    '.rec-ass-label{font-size:7.5px;font-weight:600;color:#333}.rec-ass-sub{font-size:7px;color:#888}' +
-    '.rec-rodape{text-align:center;font-size:7px;color:#bbb;margin-top:3px}';
+    '.rec-assinatura{margin-top:auto;padding-top:4px}' +
+    '.rec-ass-texto{font-size:9px;color:#555;margin-bottom:6px;line-height:1.4;text-align:justify}' +
+    '.rec-ass-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:3px}' +
+    '.rec-ass-item{text-align:center}.rec-ass-linha{border-bottom:1px solid #333;height:16px;margin-bottom:3px}' +
+    '.rec-ass-label{font-size:9px;font-weight:600;color:#333}.rec-ass-sub{font-size:8px;color:#888}' +
+    '.rec-rodape{text-align:center;font-size:8px;color:#bbb;margin-top:3px}';
+
+    
   function blocoRecibo(titulo) {
     var cpf = f.cpf||'—', admissao = f.admissao?fmtData(f.admissao):'—', depto = f.departamento||'—';
     var geradoEm = new Date().toLocaleDateString('pt-BR');
