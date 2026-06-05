@@ -149,7 +149,7 @@ function _pg(name) {
   if (name==='faltas')       { carregarSelectFuncs(); carregarFaltas(); }
   if (name==='vales')        { carregarSelectFuncs(); carregarVales(); }
   if (name==='folha')        carregarSelectFuncs();
-  if (name==='vt')           calcularVT();
+  if (name==='vt')           { carregarSelectFuncs().then(function(){ calcularVT(); }); }
 }
 
 // ─── CADASTRO ───────────────────────────────────────────────
