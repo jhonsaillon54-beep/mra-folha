@@ -920,8 +920,8 @@ var css =
     '.rec-total td{font-weight:700;padding:7px 10px;border-top:2px solid #cc2222;background:#fff5f5;font-size:19px}' +
     '.rec-ocorrencia{font-size:12px;padding:2px 0;border-bottom:1px dashed #eee;color:#555}' +
     '.rec-tipo-falta{color:#cc2222;font-weight:600}.rec-tipo-just{color:#b8860b;font-weight:600}' +
-    '.rec-assinatura{margin-top:20px;padding-top:2px}' +
-    '.rec-ass-texto{font-size:13px;color:#333;margin-bottom:6px;line-height:1.5;text-align:justify;font-weight:500}' +
+    '.rec-assinatura{margin-top:auto;padding-top:2px;display:flex;flex-direction:column;justify-content:flex-end}' +
+'.rec-ass-texto{font-size:13px;color:#333;margin-bottom:auto;margin-top:-40px;line-height:1.5;text-align:justify;font-weight:500}' +
     '.rec-ass-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:3px}' +
     '.rec-ass-item{text-align:center}' +
     '.rec-ass-linha{border-bottom:2px solid #333;height:22px;margin-bottom:3px}' +
