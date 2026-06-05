@@ -921,7 +921,7 @@ var css =
     '.rec-ocorrencia{font-size:12px;padding:2px 0;border-bottom:1px dashed #eee;color:#555}' +
     '.rec-tipo-falta{color:#cc2222;font-weight:600}.rec-tipo-just{color:#b8860b;font-weight:600}' +
     '.rec-assinatura{margin-top:auto;padding-top:2px;display:flex;flex-direction:column;justify-content:flex-end}' +
-'.rec-ass-texto{font-size:13px;color:#333;margin-bottom:auto;margin-top:-40px;line-height:1.5;text-align:justify;font-weight:500}' +
+'.rec-ass-texto{font-size:16px;color:#333;margin-bottom:auto;margin-top:-40px;line-height:1.5;text-align:justify;font-weight:500}' +
     '.rec-ass-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:30px;margin-bottom:3px}' +
     '.rec-ass-item{text-align:center}' +
     '.rec-ass-linha{border-bottom:2px solid #333;height:60px;margin-bottom:3px}' +
