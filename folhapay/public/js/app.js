@@ -1151,20 +1151,7 @@ function calcularVT() {
   '</div>';
   html += '</div>';
 
-  // Feriados
-  if (feriadosDoMes.length > 0) {
-    var diasNome = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
-    html += '<div class="card animate-in" style="margin-bottom:1.25rem"><div class="card-title">🗓 Feriados em '+nomeMes+'</div>';
-    feriadosDoMes.forEach(function(f) {
-      html += '<div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border)">' +
-        '<span style="font-family:Rajdhani,sans-serif;font-size:16px;font-weight:700;color:var(--warn);min-width:50px">'+String(f.dia).padStart(2,'0')+'/'+String(f.mes).padStart(2,'0')+'</span>' +
-        '<span style="font-size:12px;color:var(--muted);min-width:28px">'+diasNome[f.data.getDay()]+'</span>' +
-        '<span style="font-size:14px;color:var(--text)">'+f.nome+'</span>' +
-        '<span class="badge badge-warn" style="margin-left:auto">Não trabalha</span>' +
-      '</div>';
-    });
-    html += '</div>';
-  }
+
 
   // Semanas
   html += '<div class="card animate-in" style="animation-delay:.1s"><div class="card-title">📅 Semanas — pagamento toda segunda-feira</div>';
