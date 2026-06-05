@@ -350,6 +350,8 @@ async function salvarEdicao(id) {
   var grat_fixa = document.getElementById('e-grat-fixa').checked;
   var gaEdit = document.getElementById('e-grat-aux');
   var grat_aux_edit = gaEdit ? gaEdit.checked : false;
+  var vtEdit = document.getElementById('e-vale-transporte');
+  var vale_transporte_edit = vtEdit ? vtEdit.checked : false;
   if (!nome||!cpf||!cargo||isNaN(sal)||sal<=0){toast('Preencha Nome, CPF, Cargo e Salário.','err');return;}
   btn.classList.add('loading'); btn.disabled=true;
   try {
