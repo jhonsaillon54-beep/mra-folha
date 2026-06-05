@@ -896,15 +896,15 @@ var css =
     '@page{size:A4;margin:0}' +
     '@media print{body{margin:0}html,body{height:100%}}' +
     '.pagina{width:210mm;height:297mm;display:flex;flex-direction:column;overflow:hidden;page-break-inside:avoid}' +
-    '.recibo{width:210mm;height:139mm;padding:4mm 14mm;display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}' +
+    '.recibo{width:210mm;height:139mm;padding:3mm 14mm;display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}' +
     '.corte{display:flex;align-items:center;gap:6px;padding:0 14mm;height:19mm;flex-shrink:0}' +
     '.corte-linha{flex:1;border-top:2px dashed #999}' +
     '.corte-texto{font-size:10px;color:#999;letter-spacing:2px;white-space:nowrap;padding:0 6px}' +
-    '.rec-header{display:flex;justify-content:space-between;align-items:center;padding-bottom:4px;border-bottom:3px solid #cc2222;margin-bottom:4px}' +
-    '.rec-mra-box{display:inline-flex;flex-direction:column;align-items:center;border:2.5px solid #111;border-radius:2px;padding:3px 14px;line-height:1;gap:1px}' +
-    '.rec-mra-sigla{font-size:26px;font-weight:900;color:#cc2222;letter-spacing:2px;line-height:1;font-family:Arial Black,Arial}' +
-    '.rec-mra-sub{font-size:8px;font-weight:700;color:#cc2222;letter-spacing:1.5px;white-space:nowrap}' +
-    '.rec-titulo{font-size:16px;font-weight:700;color:#333;text-align:right;text-transform:uppercase}' +
+      '.rec-header{display:flex;justify-content:space-between;align-items:center;padding-bottom:5px;border-bottom:3px solid #cc2222;margin-bottom:4px}' +
+    '.rec-mra-box{display:inline-flex;flex-direction:column;align-items:center;border:2.5px solid #111;border-radius:2px;padding:8px 20px;line-height:1;gap:2px}' +
+    '.rec-mra-sigla{font-size:36px;font-weight:900;color:#cc2222;letter-spacing:2px;line-height:1;font-family:Arial Black,Arial}' +
+    '.rec-mra-sub{font-size:10px;font-weight:700;color:#cc2222;letter-spacing:1.5px;white-space:nowrap}' +
+    '.rec-titulo{font-size:18px;font-weight:700;color:#333;text-align:right;text-transform:uppercase}' +
     '.rec-section{margin-bottom:3px;padding-bottom:2px;border-bottom:1px solid #ddd}' +
     '.rec-section-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#cc2222;margin-bottom:2px;padding-bottom:2px;border-bottom:1px solid #ffcccc}' +
     '.rec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}' +
