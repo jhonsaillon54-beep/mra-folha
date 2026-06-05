@@ -890,7 +890,7 @@ function imprimirFuncionario(funcId) {
     valeObs += r.vale&&r.vale.observacao ? ' ('+r.vale.observacao+')' : '';
     linhas += '<tr><td>Vale'+valeObs+'</td><td class="right neg">- '+fmt(parseFloat(r.valorVale))+'</td></tr>';
   }
-  var css =
+var css =
     '*{box-sizing:border-box;margin:0;padding:0}' +
     'body{font-family:Arial,sans-serif;font-size:15px;color:#1a1a1a;background:#fff}' +
     '@page{size:A4;margin:0}' +
