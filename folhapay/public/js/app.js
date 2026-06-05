@@ -892,43 +892,42 @@ function imprimirFuncionario(funcId) {
   }
 var css =
     '*{box-sizing:border-box;margin:0;padding:0}' +
-    'body{font-family:Arial,sans-serif;font-size:15px;color:#1a1a1a;background:#fff}' +
+    'body{font-family:Arial,sans-serif;font-size:18px;color:#1a1a1a;background:#fff}' +
     '@page{size:A4;margin:0}' +
     '@media print{body{margin:0}html,body{height:100%}}' +
     '.pagina{width:210mm;height:297mm;display:flex;flex-direction:column;overflow:hidden;page-break-inside:avoid}' +
     '.recibo{width:210mm;height:139mm;padding:4mm 14mm;display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}' +
     '.corte{display:flex;align-items:center;gap:6px;padding:0 14mm;height:19mm;flex-shrink:0}' +
     '.corte-linha{flex:1;border-top:2px dashed #999}' +
-    '.corte-texto{font-size:11px;color:#999;letter-spacing:2px;white-space:nowrap;padding:0 6px}' +
+    '.corte-texto{font-size:12px;color:#999;letter-spacing:2px;white-space:nowrap;padding:0 6px}' +
     '.rec-header{display:flex;justify-content:space-between;align-items:center;padding-bottom:5px;border-bottom:3px solid #cc2222;margin-bottom:5px}' +
-    '.rec-mra-box{display:inline-flex;flex-direction:column;align-items:center;border:2.5px solid #111;border-radius:2px;padding:4px 16px;line-height:1;gap:1px}' +
-    '.rec-mra-sigla{font-size:30px;font-weight:900;color:#cc2222;letter-spacing:2px;line-height:1;font-family:Arial Black,Arial}' +
-    '.rec-mra-sub{font-size:9px;font-weight:700;color:#cc2222;letter-spacing:1.5px;white-space:nowrap}' +
-    '.rec-titulo{font-size:16px;font-weight:700;color:#333;text-align:right;text-transform:uppercase}' +
-    '.rec-section{margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #ddd}' +
-    '.rec-section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#cc2222;margin-bottom:3px;padding-bottom:2px;border-bottom:1px solid #ffcccc}' +
+    '.rec-mra-box{display:inline-flex;flex-direction:column;align-items:center;border:2.5px solid #111;border-radius:2px;padding:4px 18px;line-height:1;gap:1px}' +
+    '.rec-mra-sigla{font-size:34px;font-weight:900;color:#cc2222;letter-spacing:2px;line-height:1;font-family:Arial Black,Arial}' +
+    '.rec-mra-sub{font-size:10px;font-weight:700;color:#cc2222;letter-spacing:1.5px;white-space:nowrap}' +
+    '.rec-titulo{font-size:18px;font-weight:700;color:#333;text-align:right;text-transform:uppercase}' +
+    '.rec-section{margin-bottom:4px;padding-bottom:2px;border-bottom:1px solid #ddd}' +
+    '.rec-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#cc2222;margin-bottom:2px;padding-bottom:2px;border-bottom:1px solid #ffcccc}' +
     '.rec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}' +
     '.rec-field{display:flex;flex-direction:column}' +
-    '.rec-label{font-size:9px;text-transform:uppercase;color:#999;letter-spacing:.3px}' +
-    '.rec-value{font-size:15px;color:#1a1a1a}.bold{font-weight:700}.red{color:#cc2222}' +
-    '.rec-rescisao{background:#fff0f0;border:1px solid #ffcccc;border-radius:3px;padding:3px 6px;font-size:11px;color:#cc2222;font-weight:600;margin-top:2px}' +
-    '.rec-table{width:100%;border-collapse:collapse;margin-bottom:4px}' +
-    '.rec-table thead th{background:#cc2222;color:#fff;padding:6px 10px;font-size:14px;text-transform:uppercase}' +
-    '.rec-table tbody td{padding:5px 10px;border-bottom:1px solid #eee;font-size:15px}' +
+    '.rec-label{font-size:10px;text-transform:uppercase;color:#999;letter-spacing:.3px}' +
+    '.rec-value{font-size:16px;color:#1a1a1a}.bold{font-weight:700}.red{color:#cc2222}' +
+    '.rec-rescisao{background:#fff0f0;border:1px solid #ffcccc;border-radius:3px;padding:3px 6px;font-size:12px;color:#cc2222;font-weight:600;margin-top:2px}' +
+    '.rec-table{width:100%;border-collapse:collapse;margin-bottom:3px}' +
+    '.rec-table thead th{background:#cc2222;color:#fff;padding:6px 10px;font-size:16px;text-transform:uppercase}' +
+    '.rec-table tbody td{padding:5px 10px;border-bottom:1px solid #eee;font-size:17px}' +
     '.rec-table tbody tr:nth-child(even) td{background:#fafafa}.right{text-align:right}' +
     '.pos{color:#2e7d32;text-align:right}.neg{color:#cc2222;text-align:right}.cut{text-decoration:line-through;color:#aaa;text-align:right}' +
-    '.rec-total td{font-weight:700;padding:7px 10px;border-top:2px solid #cc2222;background:#fff5f5;font-size:17px}' +
-    '.rec-ocorrencia{font-size:11px;padding:2px 0;border-bottom:1px dashed #eee;color:#555}' +
+    '.rec-total td{font-weight:700;padding:7px 10px;border-top:2px solid #cc2222;background:#fff5f5;font-size:19px}' +
+    '.rec-ocorrencia{font-size:12px;padding:2px 0;border-bottom:1px dashed #eee;color:#555}' +
     '.rec-tipo-falta{color:#cc2222;font-weight:600}.rec-tipo-just{color:#b8860b;font-weight:600}' +
     '.rec-assinatura{margin-top:auto;padding-top:2px}' +
-    '.rec-ass-texto{font-size:12px;color:#333;margin-bottom:8px;line-height:1.5;text-align:justify;font-weight:500}' +
+    '.rec-ass-texto{font-size:13px;color:#333;margin-bottom:6px;line-height:1.5;text-align:justify;font-weight:500}' +
     '.rec-ass-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:3px}' +
     '.rec-ass-item{text-align:center}' +
-    '.rec-ass-linha{border-bottom:1.5px solid #333;height:20px;margin-bottom:3px}' +
-    '.rec-ass-label{font-size:12px;font-weight:700;color:#222}' +
+    '.rec-ass-linha{border-bottom:2px solid #333;height:22px;margin-bottom:3px}' +
+    '.rec-ass-label{font-size:13px;font-weight:700;color:#222}' +
     '.rec-ass-sub{font-size:10px;color:#888}' +
     '.rec-rodape{text-align:center;font-size:9px;color:#bbb;margin-top:3px}';
-
   function blocoRecibo(titulo) {
     var cpf = f.cpf||'—', admissao = f.admissao?fmtData(f.admissao):'—', depto = f.departamento||'—';
     var geradoEm = new Date().toLocaleDateString('pt-BR');
