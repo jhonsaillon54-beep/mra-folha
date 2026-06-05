@@ -1025,18 +1025,32 @@ function fmtVT(v) {
 function renderVTFuncs(semanas, valorDia, fmtDate) {
   var funcsVT = _todosFunc.filter(function(f){ return f.vale_transporte; });
   if (!funcsVT.length) return '';
+  var totalMes = semanas.reduce(function(s,sem){ return s + sem.dias.length * valorDia; }, 0);
   var html = '<div class="card animate-in" style="animation-delay:.15s"><div class="card-title">👥 Funcionários com Vale Transporte</div>';
   funcsVT.forEach(function(f) {
-    html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">' +
-      '<div>' +
-        '<div style="font-family:Rajdhani,sans-serif;font-size:15px;font-weight:700;color:var(--text)">'+f.nome+'</div>' +
-        '<div style="font-size:12px;color:var(--muted)">'+f.cargo+(f.departamento?' — '+f.departamento:'')+'</div>' +
+    html += '<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">' +
+        '<div>' +
+          '<div style="font-family:Rajdhani,sans-serif;font-size:17px;font-weight:700;color:var(--text)">'+f.nome+'</div>' +
+          '<div style="font-size:12px;color:var(--muted)">'+f.cargo+(f.departamento?' — '+f.departamento:'')+'</div>' +
+        '</div>' +
+        '<div style="text-align:right">' +
+          '<div style="font-size:11px;color:var(--muted)">Total do mês</div>' +
+          '<div style="font-family:Rajdhani,sans-serif;font-size:20px;font-weight:700;color:var(--red-l)">'+fmtVT(totalMes)+'</div>' +
+        '</div>' +
       '</div>' +
-      '<div style="text-align:right">' +
-        semanas.map(function(s,idx){
-          var v = s.dias.length * valorDia;
-          return '<div style="font-size:11px;color:var(--muted)">Sem '+(idx+1)+' ('+fmtDate(s.inicio)+'): <strong style="color:var(--red-l)">'+fmtVT(v)+'</strong></div>';
-        }).join('') +
+      '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px">' +
+      semanas.map(function(s, idx) {
+        var v = s.dias.length * valorDia;
+        var temFeriado = s.feriados.length > 0;
+        return '<div style="background:var(--bg3);border:1px solid '+(temFeriado?'rgba(255,193,7,0.4)':'var(--border2)')+';border-radius:6px;padding:8px;text-align:center">' +
+          '<div style="font-size:11px;color:var(--muted);margin-bottom:2px">Semana '+(idx+1)+'</div>' +
+          '<div style="font-size:11px;color:var(--dim);margin-bottom:4px">'+fmtDate(s.inicio)+' a '+fmtDate(s.fim)+'</div>' +
+          (temFeriado ? '<div style="font-size:10px;color:var(--warn);margin-bottom:4px">⚠ '+s.feriados[0].nome+'</div>' : '') +
+          '<div style="font-family:Rajdhani,sans-serif;font-size:16px;font-weight:700;color:'+(temFeriado?'var(--warn)':'var(--red-l)')+'">'+fmtVT(v)+'</div>' +
+          '<div style="font-size:10px;color:var(--muted)">'+s.dias.length+' dias úteis</div>' +
+        '</div>';
+      }).join('') +
       '</div>' +
     '</div>';
   });
