@@ -1054,6 +1054,11 @@ function renderVTFuncs(semanas, valorDia, fmtDate) {
       '</div>' +
     '</div>';
   });
+  var totalGeral = funcsVT.length * totalMes;
+  html += '<div style="background:var(--red);border-radius:var(--r);padding:16px 20px;display:flex;justify-content:space-between;align-items:center;margin-top:8px">' +
+    '<div style="font-family:Rajdhani,sans-serif;font-size:16px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:1px">Total geral VT do mês — '+funcsVT.length+' funcionário(s)</div>' +
+    '<div style="font-family:Rajdhani,sans-serif;font-size:26px;font-weight:700;color:#fff">'+fmtVT(totalGeral)+'</div>' +
+  '</div>';
   html += '</div>';
   return html;
 }
