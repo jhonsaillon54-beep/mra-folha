@@ -925,7 +925,7 @@ var css =
     '.rec-ass-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:30px;margin-bottom:3px}' +
     '.rec-ass-item{text-align:center}' +
     '.rec-ass-linha{border-bottom:2px solid #333;height:60px;margin-bottom:3px}' +
-    '.rec-ass-label{font-size:16px;font-weight:700;color:#222}' +
+    '.rec-ass-label{font-size:20px;font-weight:700;color:#222}' +
     '.rec-ass-sub{font-size:10px;color:#888}' +
     '.rec-rodape{text-align:center;font-size:9px;color:#bbb;margin-top:3px}';
   function blocoRecibo(titulo) {
