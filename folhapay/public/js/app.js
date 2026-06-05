@@ -194,7 +194,8 @@ async function cadastrar() {
     if (grat_aux && !gratsEnviar.find(function(g){return g.nome==='Gratificação Auxiliar';})) {
       gratsEnviar.unshift({nome:'Gratificação Auxiliar', valor:200});
     }
-    await api('POST','/funcionarios',{nome,cpf,cargo,departamento:depto,salario:sal,admissao:adm,observacoes:obs,grat_fixa,grats:gratsEnviar});
+    var vt_cad = document.getElementById('c-vale-transporte'); var vale_transporte_cad = vt_cad ? vt_cad.checked : false;
+    await api('POST','/funcionarios',{nome,cpf,cargo,departamento:depto,salario:sal,admissao:adm,observacoes:obs,grat_fixa,grats:gratsEnviar,vale_transporte:vale_transporte_cad});
     toast('Funcionário "'+nome+'" cadastrado!','ok'); limparForm(); atualizarBadgeFuncs();
   } catch(e){} finally { btn.classList.remove('loading'); btn.disabled=false; }
 }
@@ -231,6 +232,7 @@ function renderFuncionarios(lista) {
     var totalGrats = (f.grat_fixa?300:0) + (f.grats||[]).reduce(function(s,g){return s+parseFloat(g.valor);},0);
     var gratsHtml = '';
     if (f.grat_fixa) gratsHtml += '<span class="badge badge-ok">✓ Grat. fixa R$ 300,00</span>';
+    if (f.vale_transporte) gratsHtml += '<span class="badge badge-info">🚌 Vale Transporte</span>';
     (f.grats||[]).forEach(function(g){ gratsHtml+='<span class="badge badge-info">'+g.nome+': '+fmt(parseFloat(g.valor))+'</span>'; });
     html += '<div class="emp-card animate-in" id="func-'+f.id+'">' +
       '<div class="row r-btw">' +
@@ -315,6 +317,11 @@ async function abrirEdicao(id) {
             '<div style="font-size:12px;color:var(--muted)">Ative se tem direito à gratificação dos auxiliares</div></div>' +
             '<label class="toggle-switch"><input type="checkbox" id="e-grat-aux" '+((f.grats&&f.grats.find(function(g){return g.nome==='Gratificação Auxiliar';}))?'checked':'')+'>  <span class="toggle-slider"></span></label>' +
           '</div>' +
+          '<div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg2);border:1px solid var(--border2);border-radius:6px;padding:14px;gap:12px;flex-wrap:wrap;margin-top:8px">' +
+            '<div><div style="font-size:14px;font-weight:500;color:var(--text)">Vale Transporte <span style="color:var(--red-l)">🚌</span></div>' +
+            '<div style="font-size:12px;color:var(--muted)">Ative se este funcionário recebe vale transporte</div></div>' +
+            '<label class="toggle-switch"><input type="checkbox" id="e-vale-transporte" '+(f.vale_transporte?'checked':'')+'>  <span class="toggle-slider"></span></label>' +
+          '</div>' +
         '</div>' +
         '<div class="row r-end" style="margin-top:1.25rem;gap:10px">' +
           '<button class="btn btn-ghost" onclick="fecharEdicao()">Cancelar</button>' +
@@ -346,7 +353,7 @@ async function salvarEdicao(id) {
   if (!nome||!cpf||!cargo||isNaN(sal)||sal<=0){toast('Preencha Nome, CPF, Cargo e Salário.','err');return;}
   btn.classList.add('loading'); btn.disabled=true;
   try {
-    await api('PUT','/funcionarios/'+id,{nome,cpf,cargo,departamento:depto,salario:sal,admissao:adm,rescisao:resc,observacoes:obs,grat_fixa,grat_aux:grat_aux_edit});
+    await api('PUT','/funcionarios/'+id,{nome,cpf,cargo,departamento:depto,salario:sal,admissao:adm,rescisao:resc,observacoes:obs,grat_fixa,grat_aux:grat_aux_edit,vale_transporte:vale_transporte_edit});
     toast('Funcionário atualizado!','ok'); fecharEdicao(); carregarFuncionarios();
   } catch(e){} finally { btn.classList.remove('loading'); btn.disabled=false; }
 }
@@ -1012,6 +1019,29 @@ function fmtVT(v) {
   return 'R$ ' + v.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 }
 
+
+function renderVTFuncs(semanas, valorDia, fmtDate) {
+  var funcsVT = _todosFunc.filter(function(f){ return f.vale_transporte; });
+  if (!funcsVT.length) return '';
+  var html = '<div class="card animate-in" style="animation-delay:.15s"><div class="card-title">👥 Funcionários com Vale Transporte</div>';
+  funcsVT.forEach(function(f) {
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">' +
+      '<div>' +
+        '<div style="font-family:Rajdhani,sans-serif;font-size:15px;font-weight:700;color:var(--text)">'+f.nome+'</div>' +
+        '<div style="font-size:12px;color:var(--muted)">'+f.cargo+(f.departamento?' — '+f.departamento:'')+'</div>' +
+      '</div>' +
+      '<div style="text-align:right">' +
+        semanas.map(function(s,idx){
+          var v = s.dias.length * valorDia;
+          return '<div style="font-size:11px;color:var(--muted)">Sem '+(idx+1)+' ('+fmtDate(s.inicio)+'): <strong style="color:var(--red-l)">'+fmtVT(v)+'</strong></div>';
+        }).join('') +
+      '</div>' +
+    '</div>';
+  });
+  html += '</div>';
+  return html;
+}
+
 function calcularVT() {
   var mesInput = document.getElementById('vt-mes') ? document.getElementById('vt-mes').value : '';
   var passagem = parseFloat(document.getElementById('vt-passagem') ? document.getElementById('vt-passagem').value : 4.30) || 4.30;
@@ -1139,6 +1169,7 @@ function calcularVT() {
     html += '</div>';
   });
   html += '</div>';
+  html += renderVTFuncs(semanas, valorDia, fmtDate);
   html += '<div style="font-size:12px;color:var(--dim);text-align:center;margin-bottom:1rem">Valor por dia: '+passagensDia+' passagem(ns) × R$ '+passagem.toFixed(2).replace('.',',')+' = R$ '+valorDia.toFixed(2).replace('.',',')+' &nbsp;|&nbsp; Feriados nacionais + Goiás incluídos</div>';
 
   el.innerHTML = html;
