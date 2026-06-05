@@ -892,7 +892,7 @@ function imprimirFuncionario(funcId) {
   }
 var css =
     '*{box-sizing:border-box;margin:0;padding:0}' +
-    'body{font-family:Arial,sans-serif;font-size:13px;color:#1a1a1a;background:#fff}' +
+    'body{font-family:Arial,sans-serif;font-size:15px;color:#1a1a1a;background:#fff}' +
     '@page{size:A4;margin:0}' +
     '@media print{body{margin:0}html,body{height:100%}}' +
     '.pagina{width:210mm;height:297mm;display:flex;flex-direction:column;overflow:hidden;page-break-inside:avoid}' +
@@ -904,28 +904,28 @@ var css =
     '.rec-mra-box{display:inline-flex;flex-direction:column;align-items:center;border:2.5px solid #111;border-radius:2px;padding:3px 14px;line-height:1;gap:1px}' +
     '.rec-mra-sigla{font-size:26px;font-weight:900;color:#cc2222;letter-spacing:2px;line-height:1;font-family:Arial Black,Arial}' +
     '.rec-mra-sub{font-size:8px;font-weight:700;color:#cc2222;letter-spacing:1.5px;white-space:nowrap}' +
-    '.rec-titulo{font-size:14px;font-weight:700;color:#333;text-align:right;text-transform:uppercase}' +
+    '.rec-titulo{font-size:16px;font-weight:700;color:#333;text-align:right;text-transform:uppercase}' +
     '.rec-section{margin-bottom:3px;padding-bottom:2px;border-bottom:1px solid #ddd}' +
-    '.rec-section-title{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#cc2222;margin-bottom:2px;padding-bottom:2px;border-bottom:1px solid #ffcccc}' +
+    '.rec-section-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#cc2222;margin-bottom:2px;padding-bottom:2px;border-bottom:1px solid #ffcccc}' +
     '.rec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}' +
     '.rec-field{display:flex;flex-direction:column}' +
     '.rec-label{font-size:8px;text-transform:uppercase;color:#999;letter-spacing:.3px}' +
-    '.rec-value{font-size:13px;color:#1a1a1a}.bold{font-weight:700}.red{color:#cc2222}' +
-    '.rec-rescisao{background:#fff0f0;border:1px solid #ffcccc;border-radius:3px;padding:2px 6px;font-size:9px;color:#cc2222;font-weight:600;margin-top:2px}' +
+    '.rec-value{font-size:15px;color:#1a1a1a}.bold{font-weight:700}.red{color:#cc2222}' +
+    '.rec-rescisao{background:#fff0f0;border:1px solid #ffcccc;border-radius:3px;padding:2px 6px;font-size:10px;color:#cc2222;font-weight:600;margin-top:2px}' +
     '.rec-table{width:100%;border-collapse:collapse;margin-bottom:3px}' +
-    '.rec-table thead th{background:#cc2222;color:#fff;padding:4px 8px;font-size:13px;text-transform:uppercase}' +
-    '.rec-table tbody td{padding:3px 8px;border-bottom:1px solid #eee;font-size:14px}' +
+    '.rec-table thead th{background:#cc2222;color:#fff;padding:5px 10px;font-size:15px;text-transform:uppercase}' +
+    '.rec-table tbody td{padding:5px 10px;border-bottom:1px solid #eee;font-size:16px}' +
     '.rec-table tbody tr:nth-child(even) td{background:#fafafa}.right{text-align:right}' +
     '.pos{color:#2e7d32;text-align:right}.neg{color:#cc2222;text-align:right}.cut{text-decoration:line-through;color:#aaa;text-align:right}' +
-    '.rec-total td{font-weight:700;padding:5px 8px;border-top:2px solid #cc2222;background:#fff5f5;font-size:16px}' +
-    '.rec-ocorrencia{font-size:10px;padding:2px 0;border-bottom:1px dashed #eee;color:#555}' +
+    '.rec-total td{font-weight:700;padding:6px 10px;border-top:2px solid #cc2222;background:#fff5f5;font-size:18px}' +
+    '.rec-ocorrencia{font-size:11px;padding:2px 0;border-bottom:1px dashed #eee;color:#555}' +
     '.rec-tipo-falta{color:#cc2222;font-weight:600}.rec-tipo-just{color:#b8860b;font-weight:600}' +
     '.rec-assinatura{margin-top:auto;padding-top:2px}' +
-    '.rec-ass-texto{font-size:13px;color:#333;margin-bottom:6px;line-height:1.4;text-align:justify;font-weight:500}' +
+    '.rec-ass-texto{font-size:14px;color:#333;margin-bottom:6px;line-height:1.4;text-align:justify;font-weight:500}' +
     '.rec-ass-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:30px;margin-bottom:3px}' +
     '.rec-ass-item{text-align:center}' +
     '.rec-ass-linha{border-bottom:2px solid #333;height:35px;margin-bottom:3px}' +
-    '.rec-ass-label{font-size:13px;font-weight:700;color:#222}' +
+    '.rec-ass-label{font-size:14px;font-weight:700;color:#222}' +
     '.rec-ass-sub{font-size:10px;color:#888}' +
     '.rec-rodape{text-align:center;font-size:8px;color:#bbb;margin-top:3px}';
   function blocoRecibo(titulo) {
